@@ -1,48 +1,56 @@
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+import requests
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
+API_URL = "http://127.0.0.1:8000/api/create-order/"
+BOT_TOKEN = "7752051924:AAGPwvlxTxAKED0T3DpHk8UJ8EONqYBgfJY"
+
+# Static menu (or you can fetch from Django API later)
 MENU = {
-    "Coffee": 50000,
-    "Latte": 60000,
-    "Espresso": 45000
+    1: "Espresso",
+    2: "Latte",
+    3: "Cappuccino"
 }
 
-ADMIN_ID = 123456789  # Replace with your Telegram ID
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Welcome to our cafe bot! Type /menu to see the drinks.")
-
-async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     buttons = [
-        [InlineKeyboardButton(f"{item} - {price}T", callback_data=item)]
-        for item, price in MENU.items()
+        [InlineKeyboardButton(name, callback_data=str(item_id))]
+        for item_id, name in MENU.items()
     ]
-    reply_markup = InlineKeyboardMarkup(buttons)
-    await update.message.reply_text("Choose an item to order:", reply_markup=reply_markup)
+    await update.message.reply_text(
+        "☕ لطفاً یکی از آیتم‌های منو را انتخاب کنید:",
+        reply_markup=InlineKeyboardMarkup(buttons)
+    )
 
 async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    item = query.data
+    await query.answer()
+    
+    item_id = int(query.data)
     user = query.from_user
-    message = f"{user.full_name} ordered: {item}"
+
     data = {
-        "item": get_menu_item_id(item),
+        "item": item_id,
         "customer_name": user.full_name,
         "telegram_username": user.username or "",
         "status": "new"
     }
-    
-    await query.answer("Order received!")
-    await query.edit_message_text(text=f"✅ You ordered: {item}")
-    await context.bot.send_message(chat_id=ADMIN_ID, text=message)
-    
-    requests.post("https://yourdomain.com/api/create-order/", json=data)
+
+    # Send to Django API
+    try:
+        res = requests.post(API_URL, json=data)
+        if res.status_code == 201:
+            await query.edit_message_text(f"✅ سفارش شما برای {MENU[item_id]} ثبت شد.")
+        else:
+            await query.edit_message_text("❌ خطا در ثبت سفارش. لطفاً دوباره تلاش کنید.")
+    except Exception as e:
+        await query.edit_message_text("⚠️ خطا در ارتباط با سرور.")
+
+def run_bot():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(handle_order))
+    app.run_polling()
 
 if __name__ == "__main__":
-    app = ApplicationBuilder().token("YOUR_BOT_TOKEN_HERE").build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("menu", menu))
-    app.add_handler(CallbackQueryHandler(handle_order))
-
-    app.run_polling()
+    run_bot()
