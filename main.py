@@ -23,9 +23,8 @@ from orders.models import TelegramUser, Configuration, VlessConfig
 from telegram.constants import ParseMode
 import datetime
 
-# Configuration
-BOT_TOKEN = "8173740886:AAGKTILpDMFKNGGoswWNQDLFjy40QVsrCao"
-NGROK_URL = "https://70b33e4e1355.ngrok-free.app"  # Replace with your new ngrok URL
+# Import configuration
+from config import BOT_TOKEN, BASE_URL
 
 # Replace with dynamic fetching later if needed
 MENU = {
@@ -203,7 +202,7 @@ async def show_user_panel(update: Update, user: TelegramUser):
     )
     
     # Create navigation buttons
-    rules_url = f"{NGROK_URL}/api/rules/?user_id={user.telegram_id}"
+    rules_url = f"{BASE_URL}/api/rules/?user_id={user.telegram_id}"
     keyboard = [
         [
             InlineKeyboardButton("⚙️ ساخت کانفیگ", callback_data="create_config"),
@@ -282,7 +281,7 @@ async def show_create_config_panel(query, user):
     """Show configuration creation options"""
     
     # Use ngrok URL for web app
-    webapp_url = f"{NGROK_URL}/api/config-creator/?user_id={user.telegram_id}"
+    webapp_url = f"{BASE_URL}/api/config-creator/?user_id={user.telegram_id}"
     keyboard = [
         [InlineKeyboardButton("⚙️ ساخت کانفیگ", web_app=WebAppInfo(url=webapp_url))],
         [InlineKeyboardButton("🔙 بازگشت", callback_data="back_to_main")]
@@ -310,8 +309,8 @@ async def show_wallet_panel(query, user):
         "👇 سپس عکس رسید و مبلغ واریزی را از طریق دکمه \"ارسال رسید\" ارسال کنید و منتظر تایید باشید\n"
         "بعد از تایید، اطلاعیه از طریق ربات به شما ارسال خواهد شد."
     )
-    webapp_url = f"{NGROK_URL}/api/settlement/?user_id={user.telegram_id}"
-    wallet2wallet_url = f"{NGROK_URL}/api/wallet-to-wallet/?user_id={user.telegram_id}"
+    webapp_url = f"{BASE_URL}/api/settlement/?user_id={user.telegram_id}"
+    wallet2wallet_url = f"{BASE_URL}/api/wallet-to-wallet/?user_id={user.telegram_id}"
     keyboard = [
         [InlineKeyboardButton("ارسال رسید", web_app=WebAppInfo(url=webapp_url))],
         [InlineKeyboardButton("کیف به کیف", web_app=WebAppInfo(url=wallet2wallet_url))],
@@ -323,7 +322,7 @@ async def show_my_configs_panel(query, user):
     """Show user's configurations list web app"""
     
     # Use ngrok URL for web app
-    webapp_url = f"{NGROK_URL}/api/configs-list/?user_id={user.telegram_id}"
+    webapp_url = f"{BASE_URL}/api/configs-list/?user_id={user.telegram_id}"
     keyboard = [
         [InlineKeyboardButton("کانفیگ های شما", web_app=WebAppInfo(url=webapp_url))],
         [InlineKeyboardButton("🔙 بازگشت", callback_data="back_to_main")]
@@ -356,7 +355,7 @@ async def show_settings_panel(query, user):
     """Show settings web app"""
     
     # Use ngrok URL for web app
-    webapp_url = f"{NGROK_URL}/api/settings/?user_id={user.telegram_id}"
+    webapp_url = f"{BASE_URL}/api/settings/?user_id={user.telegram_id}"
     keyboard = [
         [InlineKeyboardButton("⚙️ تنظیمات", web_app=WebAppInfo(url=webapp_url))],
         [InlineKeyboardButton("🔙 بازگشت", callback_data="back_to_main")]
@@ -379,7 +378,7 @@ async def show_report_panel(query):
     
     # Get user for webapp URL
     user_id = query.from_user.id
-    webapp_url = f"{NGROK_URL}/api/report/?user_id={user_id}"
+    webapp_url = f"{BASE_URL}/api/report/?user_id={user_id}"
     
     keyboard = [
         [InlineKeyboardButton("📝 ارسال گزارش", web_app=WebAppInfo(url=webapp_url))],
@@ -481,7 +480,7 @@ async def handle_cart_actions(update: Update, context: ContextTypes.DEFAULT_TYPE
                 "status": "new"
             }
             try:
-                res = requests.post(f"{NGROK_URL}/api/create-order/", json=data)
+                res = requests.post(f"{BASE_URL}/api/create-order/", json=data)
                 if res.status_code != 201:
                     print("❌ Failed to create order:", res.json())
             except Exception as e:
@@ -497,7 +496,7 @@ async def adminweb(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not user or user.role != 'admin':
         await update.message.reply_text("❌ You are not authorized to access the admin panel.")
         return
-    webapp_url = f"{NGROK_URL}/api/admin-webapp/?user_id={user_id}"
+    webapp_url = f"{BASE_URL}/api/admin-webapp/?user_id={user_id}"
     keyboard = [
         [InlineKeyboardButton("پنل مدیریت", web_app=WebAppInfo(url=webapp_url))]
     ]

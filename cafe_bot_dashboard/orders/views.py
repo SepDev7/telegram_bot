@@ -32,9 +32,8 @@ import secrets
 from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
 from cryptography.hazmat.primitives import serialization
 
-# Configuration
-NGROK_URL = "https://70b33e4e1355.ngrok-free.app"  # Replace with your new ngrok URL
-
+# Import configuration
+from config import SERVER_DOMAIN, SERVER_IP, XUI_PORT, XUI_PATH, BASE_URL, XUI_BASE_URL, XUI_USERNAME, XUI_PASSWORD
 
 
 class CheckVerificationView(APIView):
@@ -430,8 +429,8 @@ def create_inbound(request):
             }
 
             # ✅ Login to x-ui
-            login_url = f"{NGROK_URL}/RZElYrcIBosloBn/login"
-            login_data = {"username": "admin", "password": "admin"}
+            login_url = f"{XUI_BASE_URL}/{XUI_PATH}/login"
+            login_data = {"username": XUI_USERNAME, "password": XUI_PASSWORD}
             session = requests.Session()
             login_response = session.post(login_url, json=login_data)
 
@@ -443,7 +442,7 @@ def create_inbound(request):
                 }, status=401)
 
             # ✅ Post inbound config
-            api_url = f"{NGROK_URL}/RZElYrcIBosloBn/panel/api/inbounds/add"
+            api_url = f"{XUI_BASE_URL}/{XUI_PATH}/panel/api/inbounds/add"
             headers = {"Content-Type": "application/json"}
             response = session.post(api_url, headers=headers, json=payload)
             content_type = response.headers.get("Content-Type", "")
@@ -493,7 +492,7 @@ def create_inbound(request):
                 config_name = f"TD{config_id}"
                 
                 # Generate smart link (user dashboard URL)
-                smart_link = f"{NGROK_URL}/api/user-dashboard/{user.user_code}/"
+                smart_link = f"{BASE_URL}/api/user-dashboard/{user.user_code}/"
                 
                 # Create QR code for smart link
                 import qrcode
@@ -599,7 +598,7 @@ def generate_vless_url(obj):
         flow = client.get("flow", "")
 
         return (
-            f"vless://{client_id}@localhost:{port}"
+            f"vless://{client_id}@{SERVER_DOMAIN}:{port}"
             f"?type={network}&security={security}"
             f"&pbk={pbk}&fp={fp}&sni={sni}&sid={sid}&spx={spx}&flow={flow}"
             f"#{remark}-{email}"
@@ -701,7 +700,7 @@ def api_config_creator(request):
         }
 
         # ✅ Login to x-ui
-        login_url = "http://localhost:3030/RZElYrcIBosloBn/login"
+        login_url = f"{XUI_BASE_URL}/{XUI_PATH}/login"
         login_data = {"username": "admin", "password": "admin"}
         session = requests.Session()
         print(f"🔍 Trying to login to x-ui at: {login_url}")
@@ -718,7 +717,7 @@ def api_config_creator(request):
             }, status=401)
 
         # ✅ Post inbound config
-        api_url = "http://localhost:3030/RZElYrcIBosloBn/panel/api/inbounds/add"
+        api_url = f"{XUI_BASE_URL}/{XUI_PATH}/panel/api/inbounds/add"
         headers = {"Content-Type": "application/json"}
         response = session.post(api_url, headers=headers, json=payload)
         content_type = response.headers.get("Content-Type", "")
@@ -772,7 +771,7 @@ def api_config_creator(request):
             config_name = f"TD{config_id}"
             
             # Generate smart link (user dashboard URL)
-            smart_link = f"{NGROK_URL}/api/user-dashboard/{user.user_code}/"
+            smart_link = f"{BASE_URL}/api/user-dashboard/{user.user_code}/"
             
             # Create QR code for smart link
             import qrcode
@@ -1028,7 +1027,7 @@ def user_dashboard(request, user_code):
             'user': user,
             'configs': configs,
             'configs_with_gb': configs_with_gb,
-            'ngrok_url': NGROK_URL,
+            'ngrok_url': BASE_URL,
             'profile_picture_url': user.profile_picture.url if user.profile_picture else None
         }
         
@@ -1158,10 +1157,10 @@ def external_configs_list(request):
 
     # Login to x-ui first
     try:
-        login_url = "http://localhost:3030/RZElYrcIBosloBn/login"
+        login_url = f"{XUI_BASE_URL}/{XUI_PATH}/login"
         login_data = {
-            "username": "admin",
-            "password": "admin"
+            "username": XUI_USERNAME,
+            "password": XUI_PASSWORD
         }
         
         session = requests.Session()
@@ -1182,7 +1181,7 @@ def external_configs_list(request):
 
     # Get configs from external API
     try:
-        api_url = "http://localhost:3030/RZElYrcIBosloBn/panel/api/inbounds/list"
+        api_url = f"{XUI_BASE_URL}/{XUI_PATH}/panel/api/inbounds/list"
         api_response = session.get(api_url)
         print(f"🔍 API response status: {api_response.status_code}")
         
