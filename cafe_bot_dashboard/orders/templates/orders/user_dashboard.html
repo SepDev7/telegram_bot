@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحه کاربری</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #e5e7eb;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(0, 0, 0, 0.1);
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            font-family: 'Vazir', 'Tahoma', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            text-align: center;
+            flex: 1;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="light"] .theme-toggle:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-pic {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--card-border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .connection-guide {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .guide-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .guide-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .step {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--card-border);
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .download-btn, .add-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 12px 20px;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .download-btn:hover, .add-btn:hover {
+            background: var(--card-border);
+            transform: translateY(-2px);
+        }
+
+        .platform-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .info-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .guide-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        .status-active {
+            color: #4ade80;
+        }
+
+        .status-inactive {
+            color: #f87171;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="theme-toggle">
+                <i class="fas fa-sun"></i>
+            </button>
+            <h1>صفحه کاربری</h1>
+            <div class="profile-section">
+                <div class="profile-pic">
+                    {% if profile_picture_url %}
+                        <img src="{{ profile_picture_url }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    {% else %}
+                        <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- User Information Cards -->
+        <div class="info-cards">
+            <div class="info-card">
+                <i class="fas fa-user card-icon" style="color: #3b82f6;"></i>
+                <div class="card-title">کد کاربری</div>
+                <div class="card-value">{{ user.user_code }}</div>
+            </div>
+
+            <div class="info-card">
+                <i class="fas fa-check-circle card-icon status-active"></i>
+                <div class="card-title">وضعیت</div>
+                <div class="card-value">{{ user.is_verified|yesno:"تایید شده,در انتظار تایید" }}</div>
+            </div>
+
+            <div class="info-card">
+                <i class="fas fa-coins card-icon" style="color: #f59e0b;"></i>
+                <div class="card-title">موجودی</div>
+                <div class="card-value">{{ user.balance }} سکه</div>
+            </div>
+
+            <div class="info-card">
+                <i class="fas fa-download card-icon" style="color: #8b5cf6;"></i>
+                <div class="card-title">تعداد کانفیگ ها</div>
+                <div class="card-value">{{ configs.count }}</div>
+            </div>
+        </div>
+
+        <!-- Configuration List -->
+        {% if configs %}
+        <div class="connection-guide" style="margin-top: 30px; display: none;" id="configsSection">
+            <div class="guide-header">
+                <i class="fas fa-list" style="color: #8b5cf6;"></i>
+                کانفیگ های شما
+            </div>
+            
+            <div class="guide-steps">
+                {% for config_data in configs_with_gb %}
+                <div class="step">
+                    <div class="step-number">{{ forloop.counter }}</div>
+                    <div class="step-title">کانفیگ {{ forloop.counter }}</div>
+                    <div class="step-description">
+                        <strong>حجم کل:</strong> {{ config_data.gb_value }} GB<br>
+                        <strong>استفاده شده:</strong> {{ config_data.used_gb }} GB<br>
+                        <strong>باقی‌مانده:</strong> {{ config_data.remaining_gb }} GB<br>
+                        <strong>درصد استفاده:</strong> {{ config_data.usage_percentage|floatformat:1 }}%<br>
+                        {% if config_data.days_remaining is not None %}
+                            <strong>روزهای باقی‌مانده:</strong> {{ config_data.days_remaining }} روز<br>
+                        {% endif %}
+                        <strong>تاریخ ایجاد:</strong> {{ config_data.config.created_at|date:"Y/m/d H:i" }}<br>
+                        <strong>وضعیت:</strong> 
+                        {% if config_data.is_expired %}
+                            <span class="status-inactive">منقضی شده</span>
+                        {% elif config_data.is_active %}
+                            <span class="status-active">فعال</span>
+                        {% else %}
+                            <span class="status-inactive">غیرفعال</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Progress bar for usage -->
+                    <div class="progress-bar" style="margin: 15px 0;">
+                        <div class="progress-fill" style="width: {{ config_data.usage_percentage }}%; background: {% if config_data.usage_percentage > 80 %}#f87171{% elif config_data.usage_percentage > 60 %}#f59e0b{% else %}#4ade80{% endif %};"></div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="add-btn" onclick="copyToClipboard('{{ config_data.config.vless_url }}')">
+                            <i class="fas fa-copy"></i>
+                            کپی کد کانفیگ
+                        </button>
+                        <button class="add-btn" onclick="showQRCode('{{ config_data.config.vless_url }}')">
+                            <i class="fas fa-qrcode"></i>
+                            نمایش QR کد
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="action-btn" id="configsButton">
+                <i class="fas fa-list"></i>
+                کانفیگ ها
+            </button>
+            <button class="action-btn">
+                <i class="fas fa-info-circle"></i>
+                پشتیبانی
+            </button>
+        </div>
+
+        <!-- Connection Guide -->
+        <div class="connection-guide">
+            <div class="guide-header">
+                <i class="fas fa-question-circle" style="color: #8b5cf6;"></i>
+                راهنمای اتصال
+            </div>
+
+            <div class="guide-steps">
+                <!-- Step 1: Download Programs -->
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">دانلود برنامه ها</div>
+                    <div class="step-description">
+                        با توجه به سیستم عامل خود برنامه مورد نظر را دانلود کنید
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <a href="https://apps.apple.com/us/app/streisand/id6450534064" class="download-btn" target="_blank">
+                            <i class="fas fa-download"></i>
+                            دانلود
+                            <i class="fab fa-apple platform-icon"></i>
+                            Streisand آیفون
+                        </a>
+                        <a href="https://github.com/2dust/v2rayNG/releases/download/1.10.8/v2rayNG_1.10.8_universal.apk" class="download-btn" target="_blank">
+                            <i class="fas fa-download"></i>
+                            دانلود
+                            <i class="fab fa-android platform-icon"></i>
+                            V2RayNg اندروید
+                        </a>
+                        <a href="https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-Windows-Setup-x64.exe" class="download-btn" target="_blank">
+                            <i class="fas fa-download"></i>
+                            دانلود
+                            <i class="fab fa-windows platform-icon"></i>
+                            Hiddify ویندوز
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Step 2: Add Subscription -->
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">افزودن اشتراک</div>
+                    <div class="step-description">
+                        با توجه به برنامه ای که نصب کرده اید روی دکمه مربوط به آن کلیک کنید
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="add-btn">
+                            <i class="fas fa-plus-circle"></i>
+                            افزودن
+                            <i class="fas fa-cog platform-icon"></i>
+                            افزودن به V2RayNg
+                        </button>
+                        <button class="add-btn">
+                            <i class="fas fa-plus-circle"></i>
+                            افزودن
+                            <i class="fas fa-cog platform-icon"></i>
+                            افزودن به Streisand
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Connect and Use -->
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">اتصال و استفاده</div>
+                    <div class="step-description">
+                        قبل از هر چیزی سرعت و پایداری اینترنت را چک کنید و سپس متصل شوید
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Expose user_code to JS
+        const USER_CODE = '{{ user.user_code }}';
+        
+        // Theme management
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            const icon = document.querySelector('.theme-toggle i');
+            if (theme === 'light') {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
+        
+        // Initialize theme on page load
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            setTheme(savedTheme);
+        }
+        
+        // Theme toggle functionality
+        document.querySelector('.theme-toggle').addEventListener('click', function() {
+            const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+        
+        // Initialize theme when page loads
+        initializeTheme();
+
+        // Add click handlers for buttons
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const text = this.textContent.trim();
+                if (text.includes('کانفیگ')) {
+                    // Handle configs button: fetch and show external configs
+                    fetchExternalConfigs();
+                } else if (text.includes('پشتیبانی')) {
+                    // Handle support button
+                    console.log('Support button clicked');
+                }
+            });
+        });
+
+        // Add click handlers for download and add buttons
+        document.querySelectorAll('.download-btn, .add-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Button clicked:', this.textContent.trim());
+            });
+        });
+
+        // Function to copy text to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('کد کانفیگ کپی شد!');
+            }, function(err) {
+                console.error('خطا در کپی کردن: ', err);
+                alert('خطا در کپی کردن کد');
+            });
+        }
+
+        // Function to show QR code
+        function showQRCode(text) {
+            // Create a modal to show QR code
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+                max-width: 90%;
+                max-height: 90%;
+            `;
+            
+            // Create QR code container
+            const qrContainer = document.createElement('div');
+            qrContainer.id = 'qrCodeContainer';
+            qrContainer.style.cssText = 'margin: 20px 0;';
+            
+            modalContent.appendChild(qrContainer);
+            modalContent.innerHTML += '<br><button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">بستن</button>';
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Generate QR code using the library
+            if (window.QRCode) {
+                new QRCode(qrContainer, {
+                    text: text,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        }
+
+        // Function to toggle visibility of the configurations section
+        function toggleConfigsSection() {
+            const configsSection = document.getElementById('configsSection');
+            if (configsSection.style.display === 'none') {
+                configsSection.style.display = 'block';
+            } else {
+                configsSection.style.display = 'none';
+            }
+        }
+
+        // Section to display external configs
+        let externalConfigsSection = document.getElementById('externalConfigsSection');
+        if (!externalConfigsSection) {
+            externalConfigsSection = document.createElement('div');
+            externalConfigsSection.id = 'externalConfigsSection';
+            externalConfigsSection.style = 'margin: 30px 0;';
+            document.body.appendChild(externalConfigsSection);
+        }
+
+        function fetchExternalConfigs() {
+            console.log('🔍 fetchExternalConfigs called with USER_CODE:', USER_CODE);
+            externalConfigsSection.innerHTML = '<div style="color:#3498db;text-align:center;">در حال دریافت کانفیگ ها...</div>';
+            fetch(`/api/external-configs/?user_code=${USER_CODE}`)
+                .then(res => {
+                    console.log('🔍 API response status:', res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('🔍 API response data:', data);
+                    if (!data.success) {
+                        console.log('❌ API failed:', data.message);
+                        externalConfigsSection.innerHTML = `<div style='color:red;text-align:center;'>خطا: ${data.message}</div>`;
+                        return;
+                    }
+                    console.log('✅ API success, configs count:', data.configs.length);
+                    renderExternalConfigs(data.configs);
+                })
+                .catch(err => {
+                    console.log('❌ Fetch error:', err);
+                    externalConfigsSection.innerHTML = `<div style='color:red;text-align:center;'>خطا در دریافت کانفیگ ها</div>`;
+                });
+        }
+
+        function renderExternalConfigs(configs) {
+            console.log('🔍 renderExternalConfigs called with configs:', configs);
+            if (!configs.length) {
+                console.log('❌ No configs to render');
+                externalConfigsSection.innerHTML = `<div style='color:#666;text-align:center;'>هیچ کانفیگی یافت نشد</div>`;
+                return;
+            }
+            console.log('✅ Rendering', configs.length, 'configs');
+            
+            // Create a styled section similar to the existing configs
+            externalConfigsSection.innerHTML = `
+                <div class="connection-guide" style="margin-top: 30px;">
+                    <div class="guide-header">
+                        <i class="fas fa-list" style="color: #8b5cf6;"></i>
+                        کانفیگ های خارجی شما
+                    </div>
+                    <div class="guide-steps">
+                        ${configs.map((config, index) => `
+                            <div class="step">
+                                <div class="step-number">${index + 1}</div>
+                                <div class="step-title">${config.name}</div>
+                                <div class="step-description">
+                                    <strong>حجم کل:</strong> ${config.gb_value} GB<br>
+                                    <strong>استفاده شده:</strong> ${config.used_gb} GB<br>
+                                    <strong>باقی‌مانده:</strong> ${config.remaining_gb} GB<br>
+                                    <strong>درصد استفاده:</strong> ${config.usage_percentage}%<br>
+                                    ${config.days_remaining !== null ? `<strong>روزهای باقی‌مانده:</strong> ${config.days_remaining} روز<br>` : ''}
+                                    <strong>تاریخ ایجاد:</strong> ${new Date(config.created_at).toLocaleDateString('fa-IR')}<br>
+                                    <strong>وضعیت:</strong> 
+                                    <span class="${config.status === 'active' ? 'status-active' : 'status-inactive'}">
+                                        ${config.status === 'active' ? 'فعال' : 'غیرفعال'}
+                                    </span>
+                                </div>
+                                
+                                <!-- Progress bar for usage -->
+                                <div class="progress-bar" style="margin: 15px 0;">
+                                    <div class="progress-fill" style="width: ${config.usage_percentage}%; background: ${config.usage_percentage > 80 ? '#f87171' : config.usage_percentage > 60 ? '#f59e0b' : '#4ade80'};"></div>
+                                </div>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                    <button class="add-btn" onclick="copyToClipboard('${config.vless_url}')">
+                                        <i class="fas fa-copy"></i>
+                                        کپی کد کانفیگ
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            console.log('✅ Configs rendered successfully');
+        }
+    </script>
+</body>
+</html>

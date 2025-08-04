@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ساخت کانفیگ - NiceRay Reality</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+            padding: 0;
+        }
+
+        .content {
+            padding: 20px;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .config-type {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .config-type button {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .config-type button.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1;
+            position: relative;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            color: #333;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .description-area {
+            margin-bottom: 20px;
+        }
+
+        .description-area textarea {
+            width: 100%;
+            height: 80px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: none;
+            font-family: inherit;
+        }
+
+        .balance-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .balance-input {
+            flex: 1;
+        }
+
+        .balance-input input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .balance-label {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .create-button {
+            width: 100%;
+            padding: 15px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .create-button:hover {
+            background: #229954;
+        }
+
+        .info-section {
+            margin-top: 25px;
+        }
+
+        .info-item {
+            background: #e8f4fd;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #2980b9;
+            text-align: center;
+        }
+
+        .info-item.green {
+            background: #e8f5e8;
+            color: #27ae60;
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding: 15px;
+            }
+            
+            .config-type button {
+                font-size: 11px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="config-type">
+            <button onclick="selectType('half')">نیم بها</button>
+            <button onclick="selectType('unlimited')">تونل نامحدود</button>
+            <button onclick="selectType('tunnel')" class="active">تونل نوع یک</button>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>نوع</label>
+                <select id="type">
+                    <option value="user">حجمی</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>کاربر</label>
+                <select id="volumeType">
+                    <option value="volume">بدون محدودیت</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>حجم</label>
+                <input type="number" id="volumeInput" min="30" max="150" placeholder="حجم (GB)">
+            </div>
+            <div class="form-group">
+                <label>مدت</label>
+                <select id="duration">
+                    <option value="1">یک روزه</option>
+                    <option value="30">ماهانه</option>
+                    <option value="60">دوماهه</option>
+                    <option value="90">سه ماهه</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="description-area">
+            <label>توضیحات</label>
+            <textarea id="description" placeholder="توضیحات (نام مشتری، شماره موبایل یا آی دی برای پیگیری تمدید الزامی است!)" style="height: 70px;"></textarea>
+        </div>
+
+        <div class="balance-section">
+            <div class="balance-input">
+                <input type="number" id="cost" value="0" readonly>
+            </div>
+            <div class="balance-label">
+                پرداختی شما
+            </div>
+        </div>
+
+        <button class="create-button" id="createBtn" onclick="createConfig()">
+            ساخت کانفیگ
+        </button>
+
+        <div class="info-section">
+            <div class="info-item">
+                مناسب همه اینترنت ها (کانفیگ ریلیتی)
+            </div>
+            <div class="info-item green">
+                اندروید: اپلیکشین V2rayNG ورژن 1.8.5 و بالاتر
+            </div>
+            <div class="info-item green">
+                آیفون: V2Box یا (Streisand <= پیشنهاد ما)
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        let selectedType = 'tunnel';
+        let userBalance = {{ user_balance|default:0 }};
+
+        // Initialize with user data from Telegram
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userBalance = tg.initDataUnsafe.user.balance || userBalance;
+        }
+
+        function selectType(type) {
+            selectedType = type;
+            document.querySelectorAll('.config-type button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Handle unlimited tunnel type
+            const volumeInput = document.getElementById('volumeInput');
+            const durationSelect = document.getElementById('duration');
+            
+            if (type === 'unlimited') {
+                // Lock volume field and set to 0
+                volumeInput.value = '0';
+                volumeInput.disabled = true;
+                volumeInput.style.backgroundColor = '#f5f5f5';
+                volumeInput.style.cursor = 'not-allowed';
+                
+                // Change duration options for unlimited tunnel
+                durationSelect.innerHTML = `
+                    <option value="30">ماهانه</option>
+                    <option value="60">دوماهه</option>
+                `;
+            } else {
+                // Unlock volume field for other types
+                volumeInput.disabled = false;
+                volumeInput.style.backgroundColor = 'white';
+                volumeInput.style.cursor = 'text';
+                
+                // Restore original duration options for other types
+                durationSelect.innerHTML = `
+                    <option value="1">یک روزه</option>
+                    <option value="30">ماهانه</option>
+                    <option value="60">دوماهه</option>
+                    <option value="90">سه ماهه</option>
+                `;
+            }
+            
+            // Update cost calculation
+            updateCost();
+        }
+
+        function createConfig() {
+            const duration = document.getElementById('duration').value;
+            let volume = parseInt(document.getElementById('volumeInput').value);
+            
+            // For unlimited tunnel, set volume to 0
+            if (selectedType === 'unlimited') {
+                volume = 0;
+            } else {
+                // Regular validation for other tunnel types
+                let minVolume = 1, maxVolume = 1;
+                if (duration === '30') { minVolume = 30; maxVolume = 150; }
+                else if (duration === '60') { minVolume = 60; maxVolume = 300; }
+                else if (duration === '90') { minVolume = 90; maxVolume = 450; }
+                if (isNaN(volume) || volume < minVolume || volume > maxVolume) {
+                    tg.showAlert(`حجم باید بین ${minVolume} و ${maxVolume} گیگابایت باشد`);
+                    return;
+                }
+            }
+            const configData = {
+                type: selectedType,
+                configType: document.getElementById('type').value,
+                volumeType: document.getElementById('volumeType').value,
+                duration: duration,
+                volume: volume,
+                description: document.getElementById('description').value,
+                cost: Math.abs(parseInt(document.getElementById('cost').value))
+            };
+            if (!configData.description.trim()) {
+                tg.showAlert('لطفاً توضیحات را وارد کنید');
+                return;
+            }
+            if (userBalance < configData.cost) {
+                tg.showAlert('موجودی کافی نیست. لطفاً ابتدا موجودی خود را افزایش دهید.');
+                return;
+            }
+            // Disable button and show loading
+            document.getElementById('createBtn').disabled = true;
+            document.getElementById('createBtn').innerText = 'در حال ساخت...';
+            // Prepare API call
+            const requestData = {
+                telegram_id: tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null,
+                volume: configData.volume,
+                duration: configData.duration,
+                description: configData.description
+            };
+            console.log('🔍 Sending API request:', requestData);
+            
+            fetch('https://70b33e4e1355.ngrok-free.app/api/api-config-creator/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(res => {
+                console.log('🔍 API response status:', res.status);
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log('🔍 API response data:', data);
+                console.log('🔍 API response keys:', Object.keys(data));
+                console.log('🔍 API success status:', data.success);
+                if (data.success) {
+                    console.log('🔍 API success! Showing results in web app...');
+                    
+                    // Show results directly in the web app
+                    showConfigResults(data);
+                } else {
+                    console.log('🔍 API failed:', data.msg);
+                    
+                    // Check if it's a balance error
+                    if (data.msg && data.msg.includes('موجودی ناکافی')) {
+                        tg.showAlert('موجودی ناکافی! لطفاً ابتدا موجودی خود را افزایش دهید و دوباره تلاش کنید.');
+                    } else {
+                        tg.showAlert('خطا در ساخت کانفیگ: ' + (data.msg || ''));
+                    }
+                }
+            })
+            .catch(e => {
+                tg.showAlert('خطا در ارتباط با سرور');
+            })
+            .finally(() => {
+                document.getElementById('createBtn').disabled = false;
+                document.getElementById('createBtn').innerText = 'ساخت کانفیگ';
+            });
+        }
+
+
+
+        // Update cost based on selections
+        function updateCost() {
+            const duration = parseInt(document.getElementById('duration').value);
+            const volume = parseInt(document.getElementById('volumeInput').value) || 0;
+            let totalCost = 0;
+            
+            if (selectedType === 'unlimited') {
+                // Fixed pricing for unlimited tunnel
+                if (duration === 30) {
+                    totalCost = 65000; // ماهانه
+                } else if (duration === 60) {
+                    totalCost = 140000; // دوماهه
+                }
+            } else {
+                // Regular pricing for other tunnel types
+                const costPerGB = 1500;
+                totalCost = costPerGB * volume;
+            }
+            
+            document.getElementById('cost').value = totalCost;
+        }
+
+        // Add event listeners for cost calculation
+        document.getElementById('duration').addEventListener('change', updateCost);
+        document.getElementById('volumeInput').addEventListener('input', updateCost);
+        
+        // Initialize with tunnel type one as default
+        selectType('tunnel');
+
+        // Initialize cost
+        updateCost();
+
+        // Show configuration results in the web app
+        function showConfigResults(configData) {
+            // Hide the form
+            document.querySelector('.content').style.display = 'none';
+            
+            // Create results container
+            const resultsContainer = document.createElement('div');
+            resultsContainer.className = 'content';
+            resultsContainer.style.display = 'block';
+            
+            // Create results HTML
+            resultsContainer.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="background: white; border-radius: 15px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <h2 style="color: #27ae60; margin-bottom: 20px;">✅ کانفیگ با موفقیت ایجاد شد!</h2>
+                        
+                        <div style="text-align: right; margin-bottom: 15px;">
+                            <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                                <strong>📋 شناسه کانفیگ:</strong> ${configData.config_id || ''}
+                            </div>
+                            <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                                <strong>📊 حجم:</strong> ${configData.volume || ''}
+                            </div>
+                            <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                                <strong>⏰ مدت:</strong> ${configData.duration || ''}
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: right; margin-bottom: 20px;">
+                            <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                <strong>🔗 لینک هوشمند:</strong><br>
+                                <a href="${configData.smart_link || ''}" target="_blank" style="word-break: break-all; font-size: 12px; color: #007bff; text-decoration: underline;">
+                                    ${configData.smart_link || ''}
+                                </a>
+                            </div>
+                            
+                            <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                <strong>📊 کد کانفیگ:</strong><br>
+                                <code style="word-break: break-all; font-size: 12px;">${configData.vless_url || ''}</code>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+                            ✅ مناسب همه اینترنت ها (کانفیگ ریلیتی)
+                        </div>
+                        
+                        <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+                            💰 پرداختی شما: ${configData.cost_paid || 'نامشخص'} سکه
+                        </div>
+                        
+                        ${configData.cost_paid ? `
+                        <div style="background: #d1ecf1; color: #0c5460; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+                            💳 هزینه پرداخت شده: ${configData.cost_paid} سکه
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div style="background: white; border-radius: 15px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <h3 style="color: #3498db; margin-bottom: 15px;">🔗 QR کد لینک هوشمند</h3>
+                        <div id="qrCodeContainer" style="text-align: center;"></div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button onclick="copyToClipboard('${configData.smart_link || ''}')" style="background: #3498db; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer;">
+                            📋 کپی لینک هوشمند
+                        </button>
+                        <button onclick="copyToClipboard('${configData.vless_url || ''}')" style="background: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer;">
+                            📋 کپی کد کانفیگ
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <button onclick="closeWebApp()" style="background: #e74c3c; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer;">
+                            🔙 بازگشت به ربات
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Replace the current content
+            document.body.appendChild(resultsContainer);
+            
+            // Generate QR code if available
+            if (configData.smart_link) {
+                generateQRCode(configData.smart_link, 'qrCodeContainer');
+            }
+        }
+        
+        // Generate QR code
+        function generateQRCode(text, containerId) {
+            const container = document.getElementById(containerId);
+            if (container && window.QRCode) {
+                new QRCode(container, {
+                    text: text,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        }
+        
+        // Copy text to clipboard
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    tg.showAlert('کپی شد!');
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(text);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text);
+            }
+        }
+        
+        // Fallback copy function
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                tg.showAlert('کپی شد!');
+            } catch (err) {
+                tg.showAlert('خطا در کپی کردن');
+            }
+            document.body.removeChild(textArea);
+        }
+        
+        // Close web app
+        function closeWebApp() {
+            tg.close();
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .nav-tabs .nav-link {
+            color: #495057;
+        }
+        .nav-tabs .nav-link.active {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .report-card {
+            border-left: 4px solid #007bff;
+            margin-bottom: 15px;
+        }
+        .report-card.resolved {
+            border-left-color: #28a745;
+        }
+        .report-card.unresolved {
+            border-left-color: #dc3545;
+        }
+        .user-info {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .problem-description {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .status-badge {
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Admin Panel</h2>
+    
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                👥 کاربران
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+                📋 گزارشات
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content" id="adminTabsContent">
+        <!-- Users Tab -->
+        <div class="tab-pane fade show active" id="users" role="tabpanel">
+            <div class="mt-4">
+                <table class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Telegram ID</th>
+                        <th>Username</th>
+                        <th>User Code</th>
+                        <th>Verified</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.full_name }}</td>
+                            <td>{{ user.telegram_id }}</td>
+                            <td>{{ user.telegram_username }}</td>
+                            <td>{{ user.user_code }}</td>
+                            <td>{% if user.is_verified %}✅{% else %}❌{% endif %}</td>
+                            <td>{{ user.role|title }}</td>
+                            <td>
+                                <a href="{% url 'orders:toggle_verify' user.id %}?telegram_id={{ request.GET.telegram_id }}" class="btn btn-sm btn-{% if not user.is_verified %}success{% else %}secondary{% endif %}">
+                                    {% if not user.is_verified %}Verify{% else %}Unverify{% endif %}
+                                </a>
+                                <a href="{% url 'orders:toggle_role' user.id %}?telegram_id={{ request.GET.telegram_id }}" class="btn btn-sm btn-{% if user.role != 'admin' %}warning{% else %}info{% endif %}">
+                                    {% if user.role != 'admin' %}Make Admin{% else %}Make Customer{% endif %}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Reports Tab -->
+        <div class="tab-pane fade" id="reports" role="tabpanel">
+            <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>📋 گزارشات مشکلات</h4>
+                    <button class="btn btn-primary btn-sm" onclick="loadReports()">
+                        🔄 به‌روزرسانی
+                    </button>
+                </div>
+                <div id="reportsContainer">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">در حال بارگذاری گزارشات...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Debug: Check if tabs are working
+    console.log('Admin panel loaded');
+    console.log('Reports tab element:', document.getElementById('reports-tab'));
+    
+    // Load reports when reports tab is clicked
+    document.getElementById('reports-tab').addEventListener('click', function() {
+        console.log('Reports tab clicked');
+        loadReports();
+    });
+    
+    function loadReports() {
+        console.log('Loading reports...');
+        const container = document.getElementById('reportsContainer');
+        container.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">در حال بارگذاری گزارشات...</p>
+            </div>
+        `;
+        
+        const telegramId = new URLSearchParams(window.location.search).get('telegram_id');
+        console.log('Telegram ID:', telegramId);
+        if (!telegramId) {
+            container.innerHTML = '<div class="alert alert-danger">شناسه تلگرام یافت نشد</div>';
+            return;
+        }
+        
+        const url = `/api/admin-reports/?telegram_id=${telegramId}`;
+        console.log('Fetching reports from:', url);
+        
+        fetch(url)
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Reports data:', data);
+                if (data.success) {
+                    displayReports(data.reports);
+                } else {
+                    container.innerHTML = `<div class="alert alert-danger">خطا: ${data.message}</div>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                container.innerHTML = '<div class="alert alert-danger">خطا در بارگذاری گزارشات</div>';
+            });
+    }
+    
+    function displayReports(reports) {
+        const container = document.getElementById('reportsContainer');
+        
+        if (reports.length === 0) {
+            container.innerHTML = '<div class="alert alert-info">هیچ گزارشی یافت نشد</div>';
+            return;
+        }
+        
+        let html = '';
+        reports.forEach(report => {
+            const statusClass = report.is_resolved ? 'resolved' : 'unresolved';
+            const statusBadge = report.is_resolved ? 
+                '<span class="badge bg-success status-badge">حل شده</span>' : 
+                '<span class="badge bg-warning status-badge">در انتظار</span>';
+            
+            html += `
+                <div class="card report-card ${statusClass}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title">گزارش #${report.id}</h6>
+                            ${statusBadge}
+                        </div>
+                        
+                        <div class="user-info">
+                            <strong>👤 کاربر:</strong> ${report.user_name}<br>
+                            <strong>🆔 کد کاربری:</strong> ${report.user_code}<br>
+                            <strong>📱 شناسه تلگرام:</strong> ${report.telegram_id}<br>
+                            <strong>📅 تاریخ:</strong> ${report.created_at}<br>
+                            <strong>🧪 تست شده:</strong> ${report.has_tested ? 'بله' : 'خیر'}
+                        </div>
+                        
+                        <div class="problem-description">
+                            <strong>📝 شرح مشکل:</strong><br>
+                            ${report.problem_description}
+                        </div>
+                        
+                        ${report.is_resolved ? `
+                            <div class="alert alert-success">
+                                <strong>✅ حل شده توسط:</strong> ${report.resolved_by}<br>
+                                <strong>📅 تاریخ حل:</strong> ${report.resolved_at}
+                            </div>
+                        ` : `
+                            <button class="btn btn-success btn-sm" onclick="resolveReport(${report.id})">
+                                ✅ حل شد
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    function resolveReport(reportId) {
+        if (!confirm('آیا مطمئن هستید که این گزارش حل شده است؟')) {
+            return;
+        }
+        
+        const telegramId = new URLSearchParams(window.location.search).get('telegram_id');
+        
+        fetch('/api/resolve-report/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                report_id: reportId,
+                telegram_id: telegramId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('گزارش با موفقیت حل شد');
+                loadReports(); // Reload reports
+            } else {
+                alert('خطا: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('خطا در حل گزارش');
+        });
+    }
+</script>
+</body>
+</html> 

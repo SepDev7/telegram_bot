@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تنظیمات - NiceRay Reality</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+            padding: 0;
+        }
+
+        .content {
+            padding: 20px;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .settings-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .section-description {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-section {
+            margin-bottom: 20px;
+        }
+
+        .file-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .file-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .file-button {
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .profile-photo-button {
+            padding: 10px 15px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .upload-button {
+            width: 100%;
+            padding: 15px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .upload-button:hover {
+            background: #229954;
+        }
+
+        .notification-settings {
+            margin-top: 20px;
+        }
+
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-text {
+            font-size: 14px;
+            color: #333;
+            flex: 1;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 24px;
+            background: #3498db;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.off {
+            background: #bdc3c7;
+        }
+
+        .toggle-slider {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            transition: 0.3s;
+        }
+
+        .toggle-switch.off .toggle-slider {
+            right: 28px;
+        }
+
+        .save-button {
+            width: 100%;
+            padding: 15px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 20px;
+        }
+
+        .save-button:hover {
+            background: #229954;
+        }
+
+        .preview-image {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding: 15px;
+            }
+            
+            .file-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <!-- Smart Link Settings Section -->
+        <div class="settings-section">
+            <div class="section-title">تنظیمات لینک هوشمند</div>
+            <div class="section-description">عکس باید در ابعاد مربعی باشد مثلا 180x180</div>
+            
+            <div class="file-upload-section">
+                <div class="file-input-group">
+                    <input type="file" id="profileImage" class="file-input" accept="image/*" style="display: none;">
+                    <input type="text" id="fileName" class="file-input" placeholder="No file chosen" readonly>
+                    <button class="file-button" onclick="document.getElementById('profileImage').click()">Choose File</button>
+                    <button class="profile-photo-button" onclick="selectProfilePhoto()">عکس پروفایل</button>
+                </div>
+                
+                <div id="imagePreview" class="preview-image"></div>
+                
+                <button class="upload-button" onclick="uploadProfilePhoto()">
+                    آپلود عکس پروفایل
+                </button>
+            </div>
+        </div>
+
+        <!-- Notification Settings Section -->
+        <div class="settings-section">
+            <div class="section-title">تنظیمات نوتیفیکیشن</div>
+            
+            <div class="notification-settings">
+                <div class="notification-item">
+                    <div class="notification-text">اتصال غیر مجاز به کانفیگ</div>
+                    <div class="toggle-switch active" onclick="toggleNotification('unauthorized')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                
+                <div class="notification-item">
+                    <div class="notification-text">حذف اتوماتیک به دلیل پایان مهلت تمدید</div>
+                    <div class="toggle-switch active" onclick="toggleNotification('autoDelete')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                
+                <div class="notification-item">
+                    <div class="notification-text">کانفیگ های در حال اتمام</div>
+                    <div class="toggle-switch active" onclick="toggleNotification('expiring')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                
+                <button class="save-button" onclick="saveSettings()">
+                    ثبت تنظیمات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        let userBalance = {{ user_balance|default:0 }};
+        let selectedFile = null;
+        let notificationSettings = {
+            unauthorized: true,
+            autoDelete: true,
+            expiring: true
+        };
+
+        // Initialize with user data from Telegram
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userBalance = tg.initDataUnsafe.user.balance || userBalance;
+        }
+
+        // File upload handling
+        document.getElementById('profileImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                selectedFile = file;
+                document.getElementById('fileName').value = file.name;
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function selectProfilePhoto() {
+            document.getElementById('profileImage').click();
+        }
+
+        function uploadProfilePhoto() {
+            if (!selectedFile) {
+                tg.showAlert('لطفاً ابتدا یک عکس انتخاب کنید');
+                return;
+            }
+
+            // Get telegram_id from URL or Telegram WebApp
+            const urlParams = new URLSearchParams(window.location.search);
+            const telegramId = urlParams.get('user_id') || (tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null);
+
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append('profile_picture', selectedFile);
+            formData.append('telegram_id', telegramId);
+
+            // Upload to server
+            fetch('/api/upload-profile-picture/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    tg.showAlert(data.message);
+                } else {
+                    tg.showAlert('خطا: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                tg.showAlert('خطا در آپلود عکس');
+            });
+        }
+
+        function toggleNotification(type) {
+            const toggle = event.target.closest('.toggle-switch');
+            toggle.classList.toggle('off');
+            notificationSettings[type] = !toggle.classList.contains('off');
+        }
+
+        function saveSettings() {
+            // Send settings to bot
+            tg.sendData(JSON.stringify({
+                action: 'save_notification_settings',
+                settings: notificationSettings
+            }));
+            
+            tg.showAlert('تنظیمات با موفقیت ذخیره شد');
+        }
+
+        // Load existing settings (you can replace this with actual data from server)
+        function loadSettings() {
+            // For now, using default values
+            // In a real app, you'd load these from the server
+            notificationSettings = {
+                unauthorized: true,
+                autoDelete: true,
+                expiring: true
+            };
+        }
+
+        // Initialize settings
+        loadSettings();
+    </script>
+</body>
+</html> 

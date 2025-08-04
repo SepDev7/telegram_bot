@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت - NiceRay Reality</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+            padding: 0;
+        }
+        .content {
+            padding: 20px;
+            max-width: 100%;
+            margin: 0;
+        }
+        .admin-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        .admin-table th, .admin-table td {
+            border: 1px solid #e0e0e0;
+            padding: 8px 6px;
+            font-size: 13px;
+            text-align: center;
+        }
+        .admin-table th {
+            background: #f8f9fa;
+            color: #333;
+        }
+        .admin-actions {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            color: white;
+        }
+        .verify-btn { background: #27ae60; }
+        .role-btn { background: #2980b9; }
+        .delete-btn { background: #e74c3c; }
+        .info-section {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #888;
+            text-align: center;
+        }
+        @media (max-width: 480px) {
+            .content { padding: 10px; }
+            .admin-section { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="admin-section">
+            <div class="section-title">مدیریت کاربران</div>
+            <table class="admin-table" id="usersTable">
+                <thead>
+                    <tr>
+                        <th>کد کاربری</th>
+                        <th>نام</th>
+                        <th>وضعیت</th>
+                        <th>نقش</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Users will be loaded here -->
+                </tbody>
+            </table>
+            <div class="info-section" id="adminInfo">برای مدیریت کاربران، روی دکمه‌های عملیات کلیک کنید.</div>
+        </div>
+        <div class="admin-section">
+            <div class="section-title">مدیریت کانفیگ‌ها</div>
+            <div class="info-section">(در این نسخه فقط نمایشی است)</div>
+        </div>
+        <div class="admin-section" id="receiptsSection">
+            <div class="section-title">تایید رسیدهای واریزی</div>
+            <table class="admin-table" id="receiptsTable">
+                <thead>
+                    <tr>
+                        <th>کاربر</th>
+                        <th>کد</th>
+                        <th>مبلغ</th>
+                        <th>عکس رسید</th>
+                        <th>تاریخ</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Receipts will be loaded here -->
+                </tbody>
+            </table>
+            <div class="info-section" id="receiptsInfo">در حال بارگذاری رسیدها...</div>
+        </div>
+        
+        <div class="admin-section" id="reportsSection">
+            <div class="section-title">📋 گزارشات مشکلات</div>
+            <div style="margin-bottom: 15px;">
+                <button class="action-btn verify-btn" onclick="fetchReports()" style="margin: 0;">
+                    🔄 به‌روزرسانی گزارشات
+                </button>
+            </div>
+            <div id="reportsContainer">
+                <div class="info-section">در حال بارگذاری گزارشات...</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+        let users = [];
+        let userId = new URLSearchParams(window.location.search).get('user_id');
+        const apiBase = '/api/admin-api';
+
+        function fetchUsers() {
+            document.getElementById('adminInfo').innerText = 'در حال بارگذاری کاربران...';
+            fetch(`${apiBase}/users/?user_id=${userId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.users) {
+                        users = data.users;
+                        renderUsers();
+                        document.getElementById('adminInfo').innerText = 'برای مدیریت کاربران، روی دکمه‌های عملیات کلیک کنید.';
+                    } else {
+                        document.getElementById('adminInfo').innerText = data.error || 'خطا در دریافت کاربران';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('adminInfo').innerText = 'خطا در ارتباط با سرور';
+                });
+        }
+
+        function renderUsers() {
+            const tbody = document.querySelector('#usersTable tbody');
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">هیچ کاربری یافت نشد</td></tr>';
+                return;
+            }
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.code}</td>
+                    <td>${user.name}</td>
+                    <td>${user.verified ? 'تایید شده' : 'در انتظار تایید'}</td>
+                    <td>${user.role === 'admin' ? 'ادمین' : 'کاربر'}</td>
+                    <td>
+                        <div class="admin-actions">
+                            <button class="action-btn verify-btn" onclick="verifyUser(${user.id})">${user.verified ? 'لغو تایید' : 'تایید'}</button>
+                            <button class="action-btn role-btn" onclick="toggleRole(${user.id})">تغییر نقش</button>
+                            <button class="action-btn delete-btn" onclick="deleteUser(${user.id})">حذف</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function verifyUser(id) {
+            fetch(`${apiBase}/user-verify/?user_id=${userId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) fetchUsers();
+                else alert(data.error || 'خطا در تایید کاربر');
+            });
+        }
+
+        function toggleRole(id) {
+            fetch(`${apiBase}/user-role/?user_id=${userId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) fetchUsers();
+                else alert(data.error || 'خطا در تغییر نقش');
+            });
+        }
+
+        function deleteUser(id) {
+            if (!confirm('آیا از حذف این کاربر اطمینان دارید؟')) return;
+            fetch(`${apiBase}/user-delete/?user_id=${userId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) fetchUsers();
+                else alert(data.error || 'خطا در حذف کاربر');
+            });
+        }
+
+        fetchUsers();
+
+        const receiptsApi = '/api/admin-receipts';
+        function fetchReceipts() {
+            document.getElementById('receiptsInfo').innerText = 'در حال بارگذاری رسیدها...';
+            fetch(`${receiptsApi}/?user_id=${userId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.receipts) {
+                        renderReceipts(data.receipts);
+                        document.getElementById('receiptsInfo').innerText = data.receipts.length ? '' : 'هیچ رسیدی برای تایید وجود ندارد';
+                    } else {
+                        document.getElementById('receiptsInfo').innerText = data.error || 'خطا در دریافت رسیدها';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('receiptsInfo').innerText = 'خطا در ارتباط با سرور';
+                });
+        }
+        function renderReceipts(receipts) {
+            const tbody = document.querySelector('#receiptsTable tbody');
+            if (receipts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">هیچ رسیدی یافت نشد</td></tr>';
+                return;
+            }
+            tbody.innerHTML = receipts.map(r => `
+                <tr>
+                    <td>${r.user}</td>
+                    <td>${r.user_code}</td>
+                    <td><input type="number" value="${r.edited_amount || r.amount}" min="1" style="width:80px" id="amount-${r.id}"></td>
+                    <td><a href="${r.image_url}" target="_blank">مشاهده</a></td>
+                    <td>${r.created_at}</td>
+                    <td><button class="action-btn verify-btn" onclick="verifyReceipt(${r.id})">تایید</button></td>
+                </tr>
+            `).join('');
+        }
+        function verifyReceipt(id) {
+            const amount = document.getElementById(`amount-${id}`).value;
+            fetch('/api/verify-receipt/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, amount, user_id: userId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message || (data.success ? 'تایید شد' : 'خطا'));
+                if (data.success) fetchReceipts();
+            });
+        }
+        // Fetch receipts on page load
+        fetchReceipts();
+        
+        // Reports functionality
+        function fetchReports() {
+            const container = document.getElementById('reportsContainer');
+            container.innerHTML = '<div class="info-section">در حال بارگذاری گزارشات...</div>';
+            
+            fetch(`/api/admin-reports/?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayReports(data.reports);
+                    } else {
+                        container.innerHTML = `<div class="info-section" style="color: #e74c3c;">خطا: ${data.message}</div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    container.innerHTML = '<div class="info-section" style="color: #e74c3c;">خطا در بارگذاری گزارشات</div>';
+                });
+        }
+        
+        function displayReports(reports) {
+            const container = document.getElementById('reportsContainer');
+            
+            if (reports.length === 0) {
+                container.innerHTML = '<div class="info-section">هیچ گزارشی یافت نشد</div>';
+                return;
+            }
+            
+            let html = '';
+            reports.forEach(report => {
+                const statusBadge = report.is_resolved ? 
+                    '<span style="background: #27ae60; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">حل شده</span>' : 
+                    '<span style="background: #f39c12; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">در انتظار</span>';
+                
+                html += `
+                    <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; background: #f8f9fa;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong>گزارش #${report.id}</strong>
+                            ${statusBadge}
+                        </div>
+                        
+                        <div style="background: white; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px;">
+                            <strong>👤 کاربر:</strong> ${report.user_name}<br>
+                            <strong>🆔 کد کاربری:</strong> ${report.user_code}<br>
+                            <strong>📱 شناسه تلگرام:</strong> ${report.telegram_id}<br>
+                            <strong>📅 تاریخ:</strong> ${report.created_at}<br>
+                            <strong>🧪 تست شده:</strong> ${report.has_tested ? 'بله' : 'خیر'}
+                        </div>
+                        
+                        <div style="background: white; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px;">
+                            <strong>📝 شرح مشکل:</strong><br>
+                            ${report.problem_description}
+                        </div>
+                        
+                        ${report.is_resolved ? `
+                            <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; font-size: 13px;">
+                                <strong>✅ حل شده توسط:</strong> ${report.resolved_by}<br>
+                                <strong>📅 تاریخ حل:</strong> ${report.resolved_at}
+                            </div>
+                        ` : `
+                            <button class="action-btn verify-btn" onclick="resolveReport(${report.id})" style="margin: 0;">
+                                ✅ حل شد
+                            </button>
+                        `}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function resolveReport(reportId) {
+            if (!confirm('آیا مطمئن هستید که این گزارش حل شده است؟')) {
+                return;
+            }
+            
+            fetch('/api/resolve-report/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    report_id: reportId,
+                    telegram_id: userId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('گزارش با موفقیت حل شد');
+                    fetchReports(); // Reload reports
+                } else {
+                    alert('خطا: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('خطا در حل گزارش');
+            });
+        }
+        
+        // Fetch reports on page load
+        fetchReports();
+    </script>
+</body>
+</html> 
