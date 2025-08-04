@@ -353,7 +353,7 @@
             };
             console.log('🔍 Sending API request:', requestData);
             
-            fetch('https://70b33e4e1355.ngrok-free.app/api/api-config-creator/', {
+            fetch('{{ request.scheme }}://{{ request.get_host }}/api/api-config-creator/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

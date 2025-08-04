@@ -1,9 +1,10 @@
 import requests
 import json
+from config import BASE_URL
 
 # Test the API endpoint
 def test_api_endpoint():
-    url = "http://localhost:8000/api/api-config-creator/"
+    url = f"{BASE_URL}/api/api-config-creator/"
     
     # Test data
     test_data = {
@@ -28,7 +29,7 @@ def test_api_endpoint():
             print("❌ Endpoint returned error")
             
     except requests.exceptions.ConnectionError:
-        print("❌ Cannot connect to Django server. Make sure it's running on port 8000")
+        print("❌ Cannot connect to Django server. Make sure it's running.")
     except Exception as e:
         print(f"❌ Error: {e}")
 

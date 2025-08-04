@@ -1,8 +1,9 @@
 import requests
 import json
+from config import BASE_URL
 
 def test_fixed_endpoint():
-    """Test the API with the correct ngrok URL"""
+    """Test the API with the correct server URL"""
     
     # Use a real user from the database
     test_data = {
@@ -12,8 +13,8 @@ def test_fixed_endpoint():
         "description": "Test config after fix"
     }
     
-    # Use the correct ngrok URL
-    url = "https://7cbe3eb18c4b.ngrok-free.app/api/api-config-creator/"
+    # Use the correct server URL
+    url = f"{BASE_URL}/api/api-config-creator/"
     
     print("🧪 Testing fixed endpoint...")
     print(f"🔍 URL: {url}")
@@ -54,6 +55,6 @@ if __name__ == "__main__":
     if success:
         print("\n🎉 PROBLEM SOLVED!")
         print("The 'ساخت کانفیگ' functionality should now work correctly.")
-        print("The issue was the wrong ngrok URL in the webapp template.")
+        print("The issue was the wrong server URL in the webapp template.")
     else:
         print("\n❌ Still having issues. Please check Django logs.") 

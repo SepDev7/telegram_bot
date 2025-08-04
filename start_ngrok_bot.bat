@@ -1,12 +1,11 @@
 @echo off
-echo 🚀 Starting Telegram Bot with Ngrok...
+echo 🚀 Starting Telegram Bot with Server Configuration...
 echo.
 
 echo 📋 Instructions:
 echo 1. Start Django server (this script will do it)
-echo 2. Start ngrok: ngrok http 8000
-echo 3. Update NGROK_URL in main.py with your ngrok URL
-echo 4. Start the bot: python main.py
+echo 2. Make sure your server is configured in config.py
+echo 3. Start the bot: python main.py
 echo.
 
 echo 🔧 Starting Django server...
@@ -16,10 +15,9 @@ start python manage.py runserver 127.0.0.1:8000
 echo.
 echo ✅ Django server started!
 echo.
-echo 🌐 Now start ngrok in a new terminal:
-echo ngrok http 8000
-echo.
-echo 📝 Copy the HTTPS URL and update NGROK_URL in main.py
+echo 🌐 Make sure your server is accessible:
+echo - Check config.py for correct SERVER_DOMAIN and SERVER_IP
+echo - Verify x-ui panel is running
 echo.
 echo 🤖 Then start the bot:
 echo python main.py

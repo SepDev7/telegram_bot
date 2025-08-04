@@ -6,33 +6,34 @@ A Telegram bot with a beautiful Persian web app interface for configuration mana
 
 ### **Prerequisites**
 
-1. **Install ngrok**: Download from [ngrok.com](https://ngrok.com)
-2. **Sign up for free account**: Get your authtoken
-3. **Configure ngrok**: `ngrok config add-authtoken YOUR_TOKEN`
+1. **Server setup**: Configure your server domain and IP
+2. **X-UI Panel**: Make sure x-ui panel is running
+3. **Python dependencies**: Install required packages
 
 ### **Setup Steps**
 
-1. **Start Django Server**
+1. **Configure Server Settings**
+
+   ```bash
+   python setup_server.py
+   ```
+
+   Or manually edit `config.py`:
+
+   ```python
+   SERVER_DOMAIN = "your-domain.com"
+   SERVER_IP = "your-server-ip"
+   XUI_PORT = "3030"
+   ```
+
+2. **Start Django Server**
 
    ```bash
    cd cafe_bot_dashboard
-   python manage.py runserver 127.0.0.1:8000
+   python manage.py runserver
    ```
 
-2. **Start ngrok Tunnel**
-
-   ```bash
-   ngrok http 8000
-   ```
-
-3. **Update Bot Configuration**
-   Copy the HTTPS URL from ngrok and update it in `main.py`:
-
-   ```python
-   NGROK_URL = "https://your-ngrok-url.ngrok.io"  # Replace with your ngrok URL
-   ```
-
-4. **Start the Bot**
+3. **Start the Bot**
    ```bash
    python main.py
    ```
@@ -61,7 +62,7 @@ A Telegram bot with a beautiful Persian web app interface for configuration mana
 
 ## 🧪 Testing
 
-1. **Test the web app**: Open your ngrok URL + `/api/config-creator/`
+1. **Test the web app**: Open your server URL + `/api/config-creator/`
 2. **Test the bot**: Send `/start` to your bot
 3. **Click "⚙️ ساخت کانفیگ"**: Should open the web app immediately
 
@@ -69,7 +70,9 @@ A Telegram bot with a beautiful Persian web app interface for configuration mana
 
 ```
 telegram/
-├── main.py                    # Main bot file (updated for ngrok)
+├── main.py                    # Main bot file
+├── config.py                  # Server configuration
+├── setup_server.py            # Interactive server setup
 ├── cafe_bot_dashboard/        # Django project
 │   ├── orders/
 │   │   ├── models.py         # Database models
@@ -79,7 +82,7 @@ telegram/
 │   └── manage.py
 ├── requirements.txt           # Python dependencies
 ├── start_ngrok_bot.bat       # Windows startup script
-└── NGROK_SETUP.md           # Detailed setup guide
+└── SERVER_SETUP.md           # Detailed setup guide
 ```
 
 ## 🔧 Admin Commands
@@ -98,28 +101,45 @@ telegram/
 /adminweb
 ```
 
-## 🎉 User Experience
+## 🌐 Configuration Options
 
-When users click "⚙️ ساخت کانفیگ":
+### **Option 1: Domain + IP (Recommended)**
 
-- ✅ **Opens web app immediately** - no intermediate steps
-- ✅ **Beautiful Persian interface** - matches NiceRay Reality
-- ✅ **Full functionality** - configuration creation, balance checking
-- ✅ **Works with ngrok** - public HTTPS URL
+```python
+SERVER_DOMAIN = "yourdomain.com"  # Public domain
+SERVER_IP = "192.168.1.100"       # Internal IP
+```
 
-## 📚 Documentation
+### **Option 2: IP Only**
 
-- **NGROK_SETUP.md** - Detailed ngrok setup guide
-- **start_ngrok_bot.bat** - Windows one-click startup
+```python
+SERVER_DOMAIN = "your-server-ip"  # Same as IP
+SERVER_IP = "your-server-ip"      # Server IP
+```
 
-## 🚀 Success!
+### **Option 3: Localhost (Development)**
 
-You now have:
+```python
+SERVER_DOMAIN = "localhost"
+SERVER_IP = "127.0.0.1"
+```
 
-- ✅ **Ngrok tunnel** - public HTTPS URL
-- ✅ **Direct web app access** - click button → opens immediately
-- ✅ **Beautiful Persian interface** - matches NiceRay Reality
-- ✅ **Full functionality** - configuration creation, balance checking
-- ✅ **Clean codebase** - removed unnecessary files
+## 🔒 Security Considerations
 
-**Start testing now!** 🚀
+- ✅ **HTTPS required** for production
+- ✅ **Firewall configuration** for x-ui panel
+- ✅ **Strong passwords** for x-ui admin
+- ✅ **Regular updates** for security patches
+
+## 🚀 Deployment
+
+1. **Production Server**: Use a VPS with domain
+2. **SSL Certificate**: Configure HTTPS
+3. **Reverse Proxy**: Use nginx/apache
+4. **Process Manager**: Use systemd or supervisor
+
+## 📞 Support
+
+- **Documentation**: See `SERVER_SETUP.md`
+- **Configuration**: Run `python setup_server.py`
+- **Testing**: Use `python test_xui_api.py`

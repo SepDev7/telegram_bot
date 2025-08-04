@@ -1,95 +1,60 @@
-# 🚀 Ngrok Setup for Telegram Bot
+# 🚫 DEPRECATED: Ngrok Setup for Telegram Bot
 
-## **📋 Prerequisites**
+> **⚠️ This guide is deprecated. The bot now uses server-based configuration instead of ngrok.**
 
-1. **Install ngrok**: Download from [ngrok.com](https://ngrok.com)
-2. **Sign up for free account**: Get your authtoken
-3. **Configure ngrok**: `ngrok config add-authtoken YOUR_TOKEN`
+## **📋 Migration Required**
 
-## **🔧 Setup Steps**
+The bot has been updated to use server-based configuration instead of ngrok. Please use the new setup:
 
-### **1. Start Django Server**
+### **New Setup Guide**
 
-```bash
-cd cafe_bot_dashboard
-python manage.py runserver 127.0.0.1:8000
-```
+1. **Use the new configuration**: See `SERVER_SETUP.md`
+2. **Run setup script**: `python setup_server.py`
+3. **Configure your server**: Edit `config.py`
 
-### **2. Start ngrok Tunnel**
+### **Why the Change?**
 
-```bash
-ngrok http 8000
-```
+- ✅ **More stable** - No dependency on ngrok service
+- ✅ **Better performance** - Direct server access
+- ✅ **More secure** - Full control over your infrastructure
+- ✅ **Production ready** - Suitable for production deployment
 
-### **3. Update Bot Configuration**
+## **🚀 Quick Migration**
 
-Copy the HTTPS URL from ngrok (e.g., `https://abc123.ngrok.io`) and update it in `main.py`:
+1. **Run the setup script**:
 
-```python
-NGROK_URL = "https://your-ngrok-url.ngrok.io"  # Replace with your ngrok URL
-```
+   ```bash
+   python setup_server.py
+   ```
 
-### **4. Start the Bot**
+2. **Configure your server details**:
 
-```bash
-python main.py
-```
+   ```python
+   # In config.py
+   SERVER_DOMAIN = "your-domain.com"
+   SERVER_IP = "your-server-ip"
+   XUI_PORT = "3030"
+   ```
 
-## **🧪 Testing**
+3. **Start the bot**:
+   ```bash
+   python main.py
+   ```
 
-1. **Test the web app**: Open your ngrok URL + `/api/config-creator/`
-2. **Test the bot**: Send `/start` to your bot
-3. **Click "⚙️ ساخت کانفیگ"**: Should open the web app immediately
+## **📚 New Documentation**
 
-## **📱 User Experience**
+- **SERVER_SETUP.md** - Complete server setup guide
+- **README.md** - Updated main documentation
+- **config.py** - Centralized configuration
 
-When users click "⚙️ ساخت کانفیگ":
+## **🔧 Support**
 
-- ✅ **Opens web app immediately** - no intermediate steps
-- ✅ **Beautiful Persian interface** - matches NiceRay Reality
-- ✅ **Full functionality** - configuration creation, balance checking
-- ✅ **Works with ngrok** - public HTTPS URL
+If you need help migrating:
 
-## **🔧 Admin Commands**
+1. Read `SERVER_SETUP.md`
+2. Run `python setup_server.py`
+3. Check `README.md` for updated instructions
 
-```bash
-# Verify a user
-/verify <user_code>
+---
 
-# Add balance to user
-/addbalance <user_code> <amount>
-
-# Make user admin
-/makeadmin <user_code>
-
-# Open admin panel
-/adminweb
-```
-
-## **📋 Files Structure**
-
-```
-telegram/
-├── main.py                    # Main bot file (updated for ngrok)
-├── cafe_bot_dashboard/        # Django project
-│   ├── orders/
-│   │   ├── models.py         # Database models
-│   │   ├── views.py          # Web app views
-│   │   ├── urls.py           # URL routing
-│   │   └── templates/        # Web app templates
-│   └── manage.py
-├── requirements.txt           # Python dependencies
-└── NGROK_SETUP.md           # This guide
-```
-
-## **🎉 Success!**
-
-You now have:
-
-- ✅ **Ngrok tunnel** - public HTTPS URL
-- ✅ **Direct web app access** - click button → opens immediately
-- ✅ **Beautiful Persian interface** - matches NiceRay Reality
-- ✅ **Full functionality** - configuration creation, balance checking
-- ✅ **Clean codebase** - removed unnecessary files
-
-**Start testing now!** 🚀
+**This ngrok setup guide is no longer maintained. Please use the new server-based configuration.**

@@ -1,9 +1,10 @@
 import requests
 import json
+from config import BASE_URL
 
-# Test the ngrok API endpoint
+# Test the API endpoint
 def test_ngrok_endpoint():
-    url = "https://7cbe3eb18c4b.ngrok-free.app/api/api-config-creator/"
+    url = f"{BASE_URL}/api/api-config-creator/"
     
     # Test data
     test_data = {
@@ -14,7 +15,7 @@ def test_ngrok_endpoint():
     }
     
     try:
-        print(f"🔍 Testing ngrok endpoint: {url}")
+        print(f"🔍 Testing API endpoint: {url}")
         print(f"🔍 Test data: {test_data}")
         
         response = requests.post(url, json=test_data, headers={'Content-Type': 'application/json'})
@@ -23,12 +24,12 @@ def test_ngrok_endpoint():
         print(f"🔍 Response: {response.text}")
         
         if response.status_code == 200:
-            print("✅ Ngrok endpoint is working!")
+            print("✅ API endpoint is working!")
         else:
-            print("❌ Ngrok endpoint returned error")
+            print("❌ API endpoint returned error")
             
     except requests.exceptions.ConnectionError:
-        print("❌ Cannot connect to ngrok endpoint. Check if ngrok is running.")
+        print("❌ Cannot connect to API endpoint. Check if the server is running.")
     except Exception as e:
         print(f"❌ Error: {e}")
 

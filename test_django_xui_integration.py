@@ -6,6 +6,7 @@ import string
 import base64
 from cryptography.hazmat.primitives.asymmetric import x25519
 from cryptography.hazmat.primitives import serialization
+from config import XUI_BASE_URL, XUI_PATH, XUI_USERNAME, XUI_PASSWORD
 
 def generate_reality_keys():
     """Generate Reality keys exactly like in the Django app"""
@@ -48,9 +49,9 @@ def gb_to_bytes(gb: int) -> int:
     return gb * 1024 * 1024 * 1024
 
 def test_django_xui_integration():
-    """Test the exact integration that Django uses"""
+    """Test the Django + x-ui integration"""
     
-    print("🧪 Testing Django-x-ui integration...")
+    print("🧪 Testing Django + x-ui integration...")
     print("=" * 50)
     
     # Simulate the exact payload that Django creates
@@ -114,8 +115,8 @@ def test_django_xui_integration():
     try:
         # Step 1: Login to x-ui (exact same as Django)
         print("\n1. Logging into x-ui...")
-        login_url = "http://localhost:3030/RZElYrcIBosloBn/login"
-        login_data = {"username": "admin", "password": "admin"}
+        login_url = f"{XUI_BASE_URL}/{XUI_PATH}/login"
+        login_data = {"username": XUI_USERNAME, "password": XUI_PASSWORD}
         session = requests.Session()
         
         login_response = session.post(login_url, json=login_data, timeout=10)
@@ -129,7 +130,7 @@ def test_django_xui_integration():
         
         # Step 2: Create inbound (exact same as Django)
         print("\n2. Creating inbound...")
-        api_url = "http://localhost:3030/RZElYrcIBosloBn/panel/api/inbounds/add"
+        api_url = f"{XUI_BASE_URL}/{XUI_PATH}/panel/api/inbounds/add"
         headers = {"Content-Type": "application/json"}
         
         response = session.post(api_url, headers=headers, json=payload, timeout=10)
@@ -179,7 +180,8 @@ def test_django_api_endpoint():
     
     try:
         # Test the Django API endpoint
-        django_api_url = "https://7cbe3eb18c4b.ngrok-free.app/api/api-config-creator/"
+        from config import BASE_URL
+        django_api_url = f"{BASE_URL}/api/api-config-creator/"
         
         print(f"🔍 Testing Django API: {django_api_url}")
         print(f"🔍 Test data: {test_data}")

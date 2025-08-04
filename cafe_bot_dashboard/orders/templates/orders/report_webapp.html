@@ -225,6 +225,9 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
+        
+        // Get the base URL from Django context
+        const baseUrl = '{{ request.scheme }}://{{ request.get_host }}';
 
         document.getElementById('reportForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -263,7 +266,7 @@
             console.log('📋 Sending report data:', reportData);
             
             // Send report
-            fetch('https://70b33e4e1355.ngrok-free.app/api/submit-report/', {
+            fetch(baseUrl + '/api/submit-report/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

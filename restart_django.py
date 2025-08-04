@@ -2,6 +2,7 @@ import subprocess
 import sys
 import os
 import time
+from config import BASE_URL, SERVER_IP
 
 def restart_django():
     """Restart Django server to pick up new URL changes"""
@@ -30,8 +31,8 @@ def restart_django():
         return False
     
     print("\n🚀 Starting Django server...")
-    print("📝 The server will start on http://127.0.0.1:8000")
-    print("🌐 Your ngrok URL should work now: https://659855601d44.ngrok-free.app")
+    print(f"📝 The server will start on http://{SERVER_IP}:8000")
+    print(f"🌐 Your server URL should work now: {BASE_URL}")
     print("\n📋 Available URLs:")
     print("- /api/config-creator/ - Configuration creator")
     print("- /api/configs-list/ - Configurations list")
@@ -40,7 +41,7 @@ def restart_django():
     
     try:
         # Start Django server
-        subprocess.run([sys.executable, 'manage.py', 'runserver', '127.0.0.1:8000'])
+        subprocess.run([sys.executable, 'manage.py', 'runserver', f'{SERVER_IP}:8000'])
     except KeyboardInterrupt:
         print("\n🛑 Server stopped by user")
         return True

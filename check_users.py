@@ -8,6 +8,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cafe_bot_dashboard.settings')
 django.setup()
 
 from orders.models import TelegramUser
+from config import BASE_URL
 import requests
 import json
 
@@ -25,7 +26,7 @@ def check_users_and_test():
         print(f"\n🔍 Testing with user: {test_user.telegram_id}")
         
         # Test the endpoint
-        url = "https://931a84ec9e8f.ngrok-free.app/api/api-config-creator/"
+        url = f"{BASE_URL}/api/api-config-creator/"
         test_data = {
             "telegram_id": str(test_user.telegram_id),
             "volume": "10",
