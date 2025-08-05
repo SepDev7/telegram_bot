@@ -2,20 +2,20 @@
 # Replace these values with your actual server information
 
 # Your server domain (for public access)
-SERVER_DOMAIN = "guard.stormserver.eu"  # Replace with your actual domain
+SERVER_DOMAIN = "testbot.stormserver.eu"  # Replace with your actual domain
 
 # Your server IP address (for internal API calls)
-SERVER_IP = "91.107.162.165"  # Replace with your actual server IP
+# SERVER_IP = "91.107.162.165"  # Replace with your actual server IP
 
 # X-UI Panel Configuration
-XUI_PORT = "3030"  # X-UI panel port
-XUI_PATH = "RZElYrcIBosloBn"  # X-UI panel path
+XUI_PORT = "2096"  # X-UI panel port
+XUI_PATH = "bot"  # X-UI panel path
 XUI_USERNAME = "admin"  # X-UI username
-XUI_PASSWORD = "admin"  # X-UI password
+XUI_PASSWORD = "Reza3830063"  # X-UI password
 
 # Construct URLs
 BASE_URL = f"https://{SERVER_DOMAIN}"  # For web apps and public access
-XUI_BASE_URL = f"http://{SERVER_IP}:{XUI_PORT}"  # For internal X-UI API calls
+XUI_BASE_URL = f"http://{SERVER_DOMAIN}:{XUI_PORT}"  # For internal X-UI API calls
 
 # Bot Configuration
 BOT_TOKEN = "8173740886:AAGKTILpDMFKNGGoswWNQDLFjy40QVsrCao"
