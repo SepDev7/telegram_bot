@@ -32,8 +32,16 @@ import secrets
 from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
 from cryptography.hazmat.primitives import serialization
 
-# Import configuration
-from config import SERVER_DOMAIN, SERVER_IP, XUI_PORT, XUI_PATH, BASE_URL, XUI_BASE_URL, XUI_USERNAME, XUI_PASSWORD
+# Import configuration from Django settings
+from django.conf import settings
+SERVER_DOMAIN = settings.SERVER_DOMAIN
+SERVER_IP = settings.SERVER_IP
+XUI_PORT = settings.XUI_PORT
+XUI_PATH = settings.XUI_PATH
+XUI_USERNAME = settings.XUI_USERNAME
+XUI_PASSWORD = settings.XUI_PASSWORD
+BASE_URL = settings.BASE_URL
+XUI_BASE_URL = settings.XUI_BASE_URL
 
 
 class CheckVerificationView(APIView):

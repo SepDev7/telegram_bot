@@ -130,3 +130,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Server Configuration
+SERVER_DOMAIN = "testbot.stormserver.eu"
+SERVER_IP = "91.107.162.165"  # Uncommented from config.py
+XUI_PORT = "2096"
+XUI_PATH = "bot"
+XUI_USERNAME = "admin"
+XUI_PASSWORD = "Reza3830063"
+
+# Construct URLs
+BASE_URL = f"https://{SERVER_DOMAIN}"
+XUI_BASE_URL = f"http://{SERVER_DOMAIN}:{XUI_PORT}"
+
+# Bot Configuration
+BOT_TOKEN = "8098610006:AAEMg2WcrE0DexwQ1wt9Fv72Qa5zEBF8lN0"
