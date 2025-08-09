@@ -26,8 +26,8 @@ import datetime
 # Import configuration
 from config import BOT_TOKEN, BASE_URL
 
-# For webapp URLs, we'll use the Django server IP:port
-WEBAPP_BASE_URL = f"http://91.107.162.165:8000"
+# For webapp URLs, we'll use HTTPS domain (Telegram requires HTTPS)
+WEBAPP_BASE_URL = f"https://testbot.stormserver.eu"
 
 # Replace with dynamic fetching later if needed
 MENU = {
