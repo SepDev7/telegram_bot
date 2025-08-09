@@ -42,6 +42,7 @@ XUI_USERNAME = settings.XUI_USERNAME
 XUI_PASSWORD = settings.XUI_PASSWORD
 BASE_URL = settings.BASE_URL
 XUI_BASE_URL = settings.XUI_BASE_URL
+WEBAPP_BASE_URL = settings.WEBAPP_BASE_URL
 
 
 class CheckVerificationView(APIView):
@@ -500,7 +501,7 @@ def create_inbound(request):
                 config_name = f"TD{config_id}"
                 
                 # Generate smart link (user dashboard URL)
-                smart_link = f"{BASE_URL}/api/user-dashboard/{user.user_code}/"
+                smart_link = f"{WEBAPP_BASE_URL}/api/user-dashboard/{user.user_code}/"
                 
                 # Create QR code for smart link
                 import qrcode
@@ -779,7 +780,7 @@ def api_config_creator(request):
             config_name = f"TD{config_id}"
             
             # Generate smart link (user dashboard URL)
-            smart_link = f"{BASE_URL}/api/user-dashboard/{user.user_code}/"
+            smart_link = f"{WEBAPP_BASE_URL}/api/user-dashboard/{user.user_code}/"
             
             # Create QR code for smart link
             import qrcode

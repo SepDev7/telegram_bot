@@ -139,9 +139,12 @@ XUI_PATH = "bot"
 XUI_USERNAME = "admin"
 XUI_PASSWORD = "Reza3830063"
 
-# Construct URLs
+# API URLs (for internal server calls)
 BASE_URL = f"https://{SERVER_DOMAIN}"
 XUI_BASE_URL = f"http://{SERVER_DOMAIN}:{XUI_PORT}"
+
+# Webapp URLs (for Telegram webapp external access)
+WEBAPP_BASE_URL = f"http://{SERVER_IP}:8000"
 
 # Bot Configuration
 BOT_TOKEN = "8098610006:AAEMg2WcrE0DexwQ1wt9Fv72Qa5zEBF8lN0"
