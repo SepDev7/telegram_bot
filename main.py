@@ -27,7 +27,7 @@ import datetime
 from config import BOT_TOKEN, BASE_URL
 
 # For webapp URLs, we'll use HTTPS domain (Telegram requires HTTPS)
-WEBAPP_BASE_URL = f"https://testbot.stormserver.eu"
+WEBAPP_BASE_URL = f"https://guard.stormserver.eu"
 
 # Replace with dynamic fetching later if needed
 MENU = {
