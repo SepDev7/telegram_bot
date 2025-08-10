@@ -15,7 +15,7 @@ XUI_PASSWORD = "Reza3830063"  # X-UI password
 
 # Construct URLs
 BASE_URL = f"https://{SERVER_DOMAIN}"  # For web apps and public access
-XUI_BASE_URL = f"http://{SERVER_DOMAIN}:{XUI_PORT}"  # For internal X-UI API calls
+XUI_BASE_URL = f"https://{SERVER_DOMAIN}:{XUI_PORT}"  # For internal X-UI API calls
 
 # Bot Configuration
 BOT_TOKEN = "8098610006:AAEMg2WcrE0DexwQ1wt9Fv72Qa5zEBF8lN0"

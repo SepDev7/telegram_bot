@@ -353,7 +353,7 @@
             };
             console.log('🔍 Sending API request:', requestData);
             
-            fetch('{{ request.scheme }}://{{ request.get_host }}/api/api-config-creator/', {
+            fetch('https://guard.stormserver.eu/api/api-config-creator/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -363,7 +363,7 @@
             .then(res => {
                 console.log('🔍 API response status:', res.status);
                 if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                    throw new Error(`HTTPS ${res.status}: ${res.statusText}`);
                 }
                 return res.json();
             })

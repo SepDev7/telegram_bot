@@ -710,7 +710,7 @@ def api_config_creator(request):
 
         # ✅ Login to x-ui
         login_url = f"{XUI_BASE_URL}/{XUI_PATH}/login"
-        login_data = {"username": "admin", "password": "admin"}
+        login_data = {"username": XUI_USERNAME, "password": XUI_PASSWORD}
         session = requests.Session()
         print(f"🔍 Trying to login to x-ui at: {login_url}")
         login_response = session.post(login_url, json=login_data)
