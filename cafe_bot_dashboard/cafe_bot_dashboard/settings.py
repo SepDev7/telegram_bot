@@ -142,7 +142,7 @@ XUI_PASSWORD = "Reza3830063"
 
 # API URLs (for internal server calls)
 BASE_URL = f"https://{SERVER_DOMAIN}"
-XUI_BASE_URL = f"http://{SERVER_DOMAIN}:{XUI_PORT}"
+XUI_BASE_URL = f"https://{SERVER_DOMAIN}:{XUI_PORT}"
 
 # Webapp URLs (for Telegram webapp external access)
 # Note: Telegram requires HTTPS for webapp URLs
