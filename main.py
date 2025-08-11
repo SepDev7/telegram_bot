@@ -225,6 +225,11 @@ async def show_user_panel(update: Update, user: TelegramUser):
         ]
     ]
     
+    # Add admin panel button for admin users
+    if user.role == 'admin':
+        admin_webapp_url = f"{WEBAPP_BASE_URL}/api/admin-webapp/?user_id={user.telegram_id}"
+        keyboard.append([InlineKeyboardButton("🛠️ پنل مدیریت", web_app=WebAppInfo(url=admin_webapp_url))])
+    
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     if update.message:
@@ -255,6 +260,7 @@ async def handle_panel_actions(update: Update, context: ContextTypes.DEFAULT_TYP
         await show_settings_panel(query, user)
     elif query.data == "report":
         await show_report_panel(query)
+
 
     elif query.data == "rules":
         await show_rules_panel(query)
@@ -404,6 +410,25 @@ async def show_rules_panel(query):
     keyboard = [[InlineKeyboardButton("🔙 بازگشت", callback_data="back_to_main")]]
     
     await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def show_admin_panel(query, user):
+    """Show admin panel for admin users"""
+    if user.role != 'admin':
+        await query.edit_message_text("❌ شما مجاز به دسترسی به پنل مدیریت نیستید.")
+        return
+    
+    webapp_url = f"{WEBAPP_BASE_URL}/api/admin-webapp/?user_id={user.telegram_id}"
+    keyboard = [
+        [InlineKeyboardButton("🛠️ پنل مدیریت", web_app=WebAppInfo(url=webapp_url))],
+        [InlineKeyboardButton("🔙 بازگشت", callback_data="back_to_main")]
+    ]
+    
+    await query.edit_message_text(
+        "🛠️ <b>پنل مدیریت</b>\n\n"
+        "برای ورود به پنل مدیریت روی دکمه زیر کلیک کنید:",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode=ParseMode.HTML
+    )
 
 @only_verified
 async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
