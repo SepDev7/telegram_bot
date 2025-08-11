@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پنل مدیریت - NiceRay Reality</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -14,18 +20,21 @@
             direction: rtl;
             padding: 0;
         }
+
         .content {
             padding: 20px;
             max-width: 100%;
             margin: 0;
         }
+
         .admin-section {
             background: white;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
         .section-title {
             font-size: 18px;
             font-weight: bold;
@@ -33,26 +42,32 @@
             text-align: center;
             margin-bottom: 15px;
         }
+
         .admin-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
         }
-        .admin-table th, .admin-table td {
+
+        .admin-table th,
+        .admin-table td {
             border: 1px solid #e0e0e0;
             padding: 8px 6px;
             font-size: 13px;
             text-align: center;
         }
+
         .admin-table th {
             background: #f8f9fa;
             color: #333;
         }
+
         .admin-actions {
             display: flex;
             gap: 5px;
             justify-content: center;
         }
+
         .action-btn {
             padding: 5px 10px;
             border: none;
@@ -61,30 +76,90 @@
             cursor: pointer;
             color: white;
         }
-        .verify-btn { background: #27ae60; }
-        .role-btn { background: #2980b9; }
-        .delete-btn { background: #e74c3c; }
+
+        .verify-btn {
+            background: #27ae60;
+        }
+
+        .role-btn {
+            background: #2980b9;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+        }
+
         .info-section {
             margin-top: 10px;
             font-size: 13px;
             color: #888;
             text-align: center;
         }
+
+        .search-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .search-section input {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .search-section input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .pagination-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
         @media (max-width: 480px) {
-            .content { padding: 10px; }
-            .admin-section { padding: 10px; }
+            .content {
+                padding: 10px;
+            }
+
+            .admin-section {
+                padding: 10px;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="content">
         <div class="admin-section">
             <div class="section-title">مدیریت کاربران</div>
+
+            <!-- Search Section -->
+            <div class="search-section" style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="userSearch" placeholder="جستجو بر اساس نام، شناسه تلگرام یا کد کاربری..."
+                    style="flex: 1;" onkeypress="if(event.key==='Enter') searchUsers();">
+                <button class="action-btn verify-btn" onclick="searchUsers()" style="margin: 0; padding: 8px 16px;">
+                    🔍 جستجو
+                </button>
+                <button class="action-btn role-btn" onclick="clearSearch()" style="margin: 0; padding: 8px 16px;">
+                    🗑️ پاک کردن
+                </button>
+            </div>
+
             <table class="admin-table" id="usersTable">
                 <thead>
                     <tr>
                         <th>کد کاربری</th>
                         <th>نام</th>
+                        <th>شناسه تلگرام</th>
+                        <th>موجودی</th>
                         <th>وضعیت</th>
                         <th>نقش</th>
                         <th>عملیات</th>
@@ -119,7 +194,7 @@
             </table>
             <div class="info-section" id="receiptsInfo">در حال بارگذاری رسیدها...</div>
         </div>
-        
+
         <div class="admin-section" id="reportsSection">
             <div class="section-title">📋 گزارشات مشکلات</div>
             <div style="margin-bottom: 15px;">
@@ -138,17 +213,33 @@
         tg.ready();
         let users = [];
         let userId = new URLSearchParams(window.location.search).get('user_id');
+        window.userId = userId; // Make it globally accessible
         const apiBase = '/api/admin-api';
 
-        function fetchUsers() {
+        // Pagination variables
+        let currentPage = 1;
+        const usersPerPage = 3;
+
+        function fetchUsers(searchQuery = '') {
             document.getElementById('adminInfo').innerText = 'در حال بارگذاری کاربران...';
-            fetch(`${apiBase}/users/?user_id=${userId}`)
+
+            let url = `${apiBase}/users/?user_id=${userId}`;
+            if (searchQuery) {
+                url += `&search=${encodeURIComponent(searchQuery)}`;
+            }
+
+            fetch(url)
                 .then(res => res.json())
                 .then(data => {
                     if (data.users) {
                         users = data.users;
+                        currentPage = 1; // Reset to first page when fetching new data
                         renderUsers();
-                        document.getElementById('adminInfo').innerText = 'برای مدیریت کاربران، روی دکمه‌های عملیات کلیک کنید.';
+                        if (searchQuery) {
+                            document.getElementById('adminInfo').innerText = `نتایج جستجو برای "${searchQuery}": ${users.length} کاربر یافت شد`;
+                        } else {
+                            document.getElementById('adminInfo').innerText = 'برای مدیریت کاربران، روی دکمه‌های عملیات کلیک کنید.';
+                        }
                     } else {
                         document.getElementById('adminInfo').innerText = data.error || 'خطا در دریافت کاربران';
                     }
@@ -161,13 +252,26 @@
         function renderUsers() {
             const tbody = document.querySelector('#usersTable tbody');
             if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5">هیچ کاربری یافت نشد</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7">هیچ کاربری یافت نشد</td></tr>';
                 return;
             }
-            tbody.innerHTML = users.map(user => `
+
+            // Calculate pagination
+            const totalPages = Math.ceil(users.length / usersPerPage);
+            const startIndex = (currentPage - 1) * usersPerPage;
+            const endIndex = startIndex + usersPerPage;
+            const currentUsers = users.slice(startIndex, endIndex);
+
+            // Render current page users
+            tbody.innerHTML = currentUsers.map(user => `
                 <tr>
                     <td>${user.code}</td>
                     <td>${user.name}</td>
+                    <td>${user.telegram_id || 'نامشخص'}</td>
+                    <td>
+                        <input type="number" value="${user.balance || 0}" min="0" style="width:80px; text-align: center;" 
+                               id="balance-${user.id}" onchange="updateBalance(${user.id})">
+                    </td>
                     <td>${user.verified ? 'تایید شده' : 'در انتظار تایید'}</td>
                     <td>${user.role === 'admin' ? 'ادمین' : 'کاربر'}</td>
                     <td>
@@ -179,6 +283,9 @@
                     </td>
                 </tr>
             `).join('');
+
+            // Add pagination controls
+            renderPagination(totalPages);
         }
 
         function verifyUser(id) {
@@ -187,11 +294,11 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) fetchUsers();
-                else alert(data.error || 'خطا در تایید کاربر');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) fetchUsers();
+                    else alert(data.error || 'خطا در تایید کاربر');
+                });
         }
 
         function toggleRole(id) {
@@ -200,11 +307,11 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) fetchUsers();
-                else alert(data.error || 'خطا در تغییر نقش');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) fetchUsers();
+                    else alert(data.error || 'خطا در تغییر نقش');
+                });
         }
 
         function deleteUser(id) {
@@ -214,11 +321,64 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) fetchUsers();
-                else alert(data.error || 'خطا در حذف کاربر');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) fetchUsers();
+                    else alert(data.error || 'خطا در حذف کاربر');
+                });
+        }
+
+        function searchUsers() {
+            const searchQuery = document.getElementById('userSearch').value.trim();
+            currentPage = 1; // Reset to first page when searching
+            if (searchQuery) {
+                fetchUsers(searchQuery);
+            } else {
+                fetchUsers();
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('userSearch').value = '';
+            currentPage = 1; // Reset to first page when clearing search
+            fetchUsers();
+        }
+
+        function updateBalance(userId) {
+            const balanceInput = document.getElementById(`balance-${userId}`);
+            const newBalance = parseInt(balanceInput.value);
+
+            if (isNaN(newBalance) || newBalance < 0) {
+                alert('لطفاً مقدار معتبری برای موجودی وارد کنید');
+                balanceInput.value = '0';
+                return;
+            }
+
+            fetch(`${apiBase}/user-balance/?user_id=${window.userId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: userId,
+                    balance: newBalance
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`موجودی کاربر ${data.user_name} از ${data.old_balance} به ${data.new_balance} تغییر یافت`);
+                        // Refresh the users list to show updated data
+                        fetchUsers();
+                    } else {
+                        alert(data.error || 'خطا در تغییر موجودی');
+                        // Reset the input to previous value
+                        balanceInput.value = '0';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('خطا در ارتباط با سرور');
+                    balanceInput.value = '0';
+                });
         }
 
         fetchUsers();
@@ -264,20 +424,20 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, amount, user_id: userId })
             })
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message || (data.success ? 'تایید شد' : 'خطا'));
-                if (data.success) fetchReceipts();
-            });
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message || (data.success ? 'تایید شد' : 'خطا'));
+                    if (data.success) fetchReceipts();
+                });
         }
         // Fetch receipts on page load
         fetchReceipts();
-        
+
         // Reports functionality
         function fetchReports() {
             const container = document.getElementById('reportsContainer');
             container.innerHTML = '<div class="info-section">در حال بارگذاری گزارشات...</div>';
-            
+
             fetch(`/api/admin-reports/?telegram_id=${userId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -292,21 +452,21 @@
                     container.innerHTML = '<div class="info-section" style="color: #e74c3c;">خطا در بارگذاری گزارشات</div>';
                 });
         }
-        
+
         function displayReports(reports) {
             const container = document.getElementById('reportsContainer');
-            
+
             if (reports.length === 0) {
                 container.innerHTML = '<div class="info-section">هیچ گزارشی یافت نشد</div>';
                 return;
             }
-            
+
             let html = '';
             reports.forEach(report => {
-                const statusBadge = report.is_resolved ? 
-                    '<span style="background: #27ae60; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">حل شده</span>' : 
+                const statusBadge = report.is_resolved ?
+                    '<span style="background: #27ae60; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">حل شده</span>' :
                     '<span style="background: #f39c12; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">در انتظار</span>';
-                
+
                 html += `
                     <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; background: #f8f9fa;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -340,15 +500,15 @@
                     </div>
                 `;
             });
-            
+
             container.innerHTML = html;
         }
-        
+
         function resolveReport(reportId) {
             if (!confirm('آیا مطمئن هستید که این گزارش حل شده است؟')) {
                 return;
             }
-            
+
             fetch('/api/resolve-report/', {
                 method: 'POST',
                 headers: {
@@ -359,23 +519,74 @@
                     telegram_id: userId
                 })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('گزارش با موفقیت حل شد');
-                    fetchReports(); // Reload reports
-                } else {
-                    alert('خطا: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('خطا در حل گزارش');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('گزارش با موفقیت حل شد');
+                        fetchReports(); // Reload reports
+                    } else {
+                        alert('خطا: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('خطا در حل گزارش');
+                });
         }
-        
+
+        // Pagination functions
+        function renderPagination(totalPages) {
+            const paginationContainer = document.getElementById('paginationContainer');
+            if (!paginationContainer) {
+                // Create pagination container if it doesn't exist
+                const table = document.getElementById('usersTable');
+                const paginationDiv = document.createElement('div');
+                paginationDiv.id = 'paginationContainer';
+                paginationDiv.style.marginTop = '15px';
+                paginationDiv.style.textAlign = 'center';
+                table.parentNode.insertBefore(paginationDiv, table.nextSibling);
+            }
+
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '<div style="display: flex; justify-content: center; gap: 10px; align-items: center;">';
+
+            // Previous button
+            if (currentPage > 1) {
+                paginationHTML += `<button class="action-btn role-btn" onclick="changePage(${currentPage - 1})" style="margin: 0; padding: 6px 12px;">⬅️ قبلی</button>`;
+            }
+
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    paginationHTML += `<span style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; font-size: 14px;">${i}</span>`;
+                } else {
+                    paginationHTML += `<button class="action-btn verify-btn" onclick="changePage(${i})" style="margin: 0; padding: 6px 12px;">${i}</button>`;
+                }
+            }
+
+            // Next button
+            if (currentPage < totalPages) {
+                paginationHTML += `<button class="action-btn role-btn" onclick="changePage(${currentPage + 1})" style="margin: 0; padding: 6px 12px;">بعدی ➡️</button>`;
+            }
+
+            paginationHTML += '</div>';
+            paginationHTML += `<div class="pagination-info">صفحه ${currentPage} از ${totalPages} (${users.length} کاربر کل)</div>`;
+
+            paginationContainer.innerHTML = paginationHTML;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderUsers();
+        }
+
         // Fetch reports on page load
         fetchReports();
     </script>
 </body>
-</html> 
+
+</html>

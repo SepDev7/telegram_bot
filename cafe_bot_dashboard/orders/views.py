@@ -17,6 +17,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.utils.decorators import method_decorator
 from django.core.files.storage import default_storage
 from django.db import transaction
+from django.db.models import Q
 import requests
 import time
 from orders.models import TelegramUser, VlessConfig
@@ -838,14 +839,33 @@ def admin_users_list(request):
     admin = TelegramUser.objects.filter(telegram_id=telegram_id, role='admin').first()
     if not admin:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
-    users = TelegramUser.objects.all().order_by('-id')
+    
+    # Get search query
+    search_query = request.GET.get('search', '').strip()
+    
+    # Base queryset
+    users = TelegramUser.objects.all()
+    
+    # Apply search filter if query exists
+    if search_query:
+        # Search by name, telegram_id, or user_code
+        users = users.filter(
+            Q(full_name__icontains=search_query) |
+            Q(telegram_id__icontains=search_query) |
+            Q(user_code__icontains=search_query)
+        )
+    
+    users = users.order_by('-id')
+    
     data = [
         {
             'id': u.id,
             'code': u.user_code,
             'name': u.full_name,
+            'telegram_id': u.telegram_id,
             'verified': u.is_verified,
             'role': u.role,
+            'balance': u.balance,
         } for u in users
     ]
     return JsonResponse({'users': data})
@@ -897,6 +917,38 @@ def admin_user_delete(request):
         user = TelegramUser.objects.get(id=user_id)
         user.delete()
         return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+@csrf_exempt
+@require_POST
+def admin_user_balance(request):
+    """Admin endpoint to edit user balance"""
+    telegram_id = request.GET.get('user_id')
+    admin = TelegramUser.objects.filter(telegram_id=telegram_id, role='admin').first()
+    if not admin:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    try:
+        data = json.loads(request.body)
+        user_id = data.get('id')
+        new_balance = data.get('balance')
+        
+        if new_balance is None or not isinstance(new_balance, (int, float)):
+            return JsonResponse({'error': 'Invalid balance value'}, status=400)
+        
+        user = TelegramUser.objects.get(id=user_id)
+        old_balance = user.balance
+        user.balance = new_balance
+        user.save()
+        
+        return JsonResponse({
+            'success': True, 
+            'old_balance': old_balance,
+            'new_balance': new_balance,
+            'user_name': user.full_name
+        })
+    except TelegramUser.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 

@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin-api/user-verify/', views.admin_user_verify, name='admin_user_verify'),
     path('admin-api/user-role/', views.admin_user_role, name='admin_user_role'),
     path('admin-api/user-delete/', views.admin_user_delete, name='admin_user_delete'),
+    path('admin-api/user-balance/', views.admin_user_balance, name='admin_user_balance'),
     path('admin-receipts/', views.admin_receipts_list, name='admin_receipts_list'),
     path('webapp-data/', views.webapp_data_handler, name='webapp_data_handler'),
     path('upload-settlement-receipt/', views.upload_settlement_receipt, name='upload_settlement_receipt'),
