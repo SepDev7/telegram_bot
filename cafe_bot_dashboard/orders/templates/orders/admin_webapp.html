@@ -19,62 +19,123 @@
             min-height: 100vh;
             direction: rtl;
             padding: 0;
+            overflow-x: hidden;
         }
 
         .content {
-            padding: 20px;
-            max-width: 100%;
+            padding: 10px;
+            max-width: 100vw;
             margin: 0;
+            overflow-x: hidden;
         }
 
         .admin-section {
             background: white;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 12px;
+            margin-bottom: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow-x: hidden;
         }
 
         .section-title {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: bold;
             color: #2c3e50;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .admin-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            font-size: 10px;
+            table-layout: fixed;
         }
 
         .admin-table th,
         .admin-table td {
             border: 1px solid #e0e0e0;
-            padding: 8px 6px;
-            font-size: 13px;
+            padding: 4px 2px;
             text-align: center;
+            vertical-align: middle;
+            word-wrap: break-word;
+            overflow: hidden;
         }
 
         .admin-table th {
             background: #f8f9fa;
             color: #333;
+            font-size: 9px;
+            white-space: nowrap;
         }
+
+        .admin-table td {
+            font-size: 9px;
+        }
+
+        /* Column widths */
+        .admin-table th:nth-child(1),
+        .admin-table td:nth-child(1) {
+            width: 8%;
+        }
+
+        /* کد */
+        .admin-table th:nth-child(2),
+        .admin-table td:nth-child(2) {
+            width: 15%;
+        }
+
+        /* نام */
+        .admin-table th:nth-child(3),
+        .admin-table td:nth-child(3) {
+            width: 20%;
+        }
+
+        /* تلگرام */
+        .admin-table th:nth-child(4),
+        .admin-table td:nth-child(4) {
+            width: 12%;
+        }
+
+        /* موجودی */
+        .admin-table th:nth-child(5),
+        .admin-table td:nth-child(5) {
+            width: 15%;
+        }
+
+        /* وضعیت */
+        .admin-table th:nth-child(6),
+        .admin-table td:nth-child(6) {
+            width: 15%;
+        }
+
+        /* نقش */
+        .admin-table th:nth-child(7),
+        .admin-table td:nth-child(7) {
+            width: 15%;
+        }
+
+        /* عملیات */
 
         .admin-actions {
             display: flex;
-            gap: 5px;
-            justify-content: center;
+            flex-direction: column;
+            gap: 2px;
+            align-items: center;
         }
 
         .action-btn {
-            padding: 5px 10px;
+            padding: 2px 4px;
             border: none;
-            border-radius: 6px;
-            font-size: 12px;
+            border-radius: 3px;
+            font-size: 8px;
             cursor: pointer;
             color: white;
+            white-space: nowrap;
+            min-width: 40px;
+            max-width: 100%;
         }
 
         .verify-btn {
@@ -90,25 +151,31 @@
         }
 
         .info-section {
-            margin-top: 10px;
-            font-size: 13px;
+            margin-top: 6px;
+            font-size: 10px;
             color: #888;
             text-align: center;
         }
 
         .search-section {
             background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .search-section input {
             border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 14px;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 10px;
             transition: border-color 0.3s;
+            flex: 1;
+            min-width: 120px;
         }
 
         .search-section input:focus {
@@ -117,20 +184,124 @@
             box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
         }
 
+        .search-section button {
+            padding: 4px 8px;
+            font-size: 9px;
+            white-space: nowrap;
+        }
+
         .pagination-info {
-            margin-top: 10px;
-            font-size: 12px;
+            margin-top: 6px;
+            font-size: 9px;
             color: #666;
             text-align: center;
         }
 
+        .balance-input {
+            width: 50px !important;
+            text-align: center;
+            padding: 1px 2px;
+            font-size: 9px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .compact-text {
+            font-size: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .status-badge {
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-size: 8px;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            background: #f39c12;
+        }
+
+        .status-verified {
+            background: #27ae60;
+        }
+
+        .role-badge {
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-size: 8px;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .role-user {
+            background: #3498db;
+        }
+
+        .role-admin {
+            background: #e67e22;
+        }
+
+        .telegram-id {
+            font-size: 7px;
+            word-break: break-all;
+        }
+
         @media (max-width: 480px) {
             .content {
-                padding: 10px;
+                padding: 6px;
             }
 
             .admin-section {
-                padding: 10px;
+                padding: 8px;
+            }
+
+            .admin-table {
+                font-size: 8px;
+            }
+
+            .admin-table th,
+            .admin-table td {
+                padding: 2px 1px;
+            }
+
+            .action-btn {
+                padding: 1px 3px;
+                font-size: 7px;
+                min-width: 35px;
+            }
+
+            .search-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-section input {
+                min-width: auto;
+            }
+
+            .section-title {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .admin-table {
+                font-size: 7px;
+            }
+
+            .action-btn {
+                padding: 1px 2px;
+                font-size: 6px;
+                min-width: 30px;
+            }
+
+            .section-title {
+                font-size: 12px;
             }
         }
     </style>
@@ -142,13 +313,13 @@
             <div class="section-title">مدیریت کاربران</div>
 
             <!-- Search Section -->
-            <div class="search-section" style="display: flex; gap: 10px; align-items: center;">
+            <div class="search-section">
                 <input type="text" id="userSearch" placeholder="جستجو بر اساس نام، شناسه تلگرام یا کد کاربری..."
-                    style="flex: 1;" onkeypress="if(event.key==='Enter') searchUsers();">
-                <button class="action-btn verify-btn" onclick="searchUsers()" style="margin: 0; padding: 8px 16px;">
+                    onkeypress="if(event.key==='Enter') searchUsers();">
+                <button class="action-btn verify-btn" onclick="searchUsers()">
                     🔍 جستجو
                 </button>
-                <button class="action-btn role-btn" onclick="clearSearch()" style="margin: 0; padding: 8px 16px;">
+                <button class="action-btn role-btn" onclick="clearSearch()">
                     🗑️ پاک کردن
                 </button>
             </div>
@@ -156,9 +327,9 @@
             <table class="admin-table" id="usersTable">
                 <thead>
                     <tr>
-                        <th>کد کاربری</th>
+                        <th>کد</th>
                         <th>نام</th>
-                        <th>شناسه تلگرام</th>
+                        <th>تلگرام</th>
                         <th>موجودی</th>
                         <th>وضعیت</th>
                         <th>نقش</th>
@@ -171,10 +342,12 @@
             </table>
             <div class="info-section" id="adminInfo">برای مدیریت کاربران، روی دکمه‌های عملیات کلیک کنید.</div>
         </div>
+
         <div class="admin-section">
             <div class="section-title">مدیریت کانفیگ‌ها</div>
             <div class="info-section">(در این نسخه فقط نمایشی است)</div>
         </div>
+
         <div class="admin-section" id="receiptsSection">
             <div class="section-title">تایید رسیدهای واریزی</div>
             <table class="admin-table" id="receiptsTable">
@@ -183,7 +356,7 @@
                         <th>کاربر</th>
                         <th>کد</th>
                         <th>مبلغ</th>
-                        <th>عکس رسید</th>
+                        <th>عکس</th>
                         <th>تاریخ</th>
                         <th>عملیات</th>
                     </tr>
@@ -197,7 +370,7 @@
 
         <div class="admin-section" id="reportsSection">
             <div class="section-title">📋 گزارشات مشکلات</div>
-            <div style="margin-bottom: 15px;">
+            <div style="margin-bottom: 10px;">
                 <button class="action-btn verify-btn" onclick="fetchReports()" style="margin: 0;">
                     🔄 به‌روزرسانی گزارشات
                 </button>
@@ -207,6 +380,7 @@
             </div>
         </div>
     </div>
+
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -218,7 +392,7 @@
 
         // Pagination variables
         let currentPage = 1;
-        const usersPerPage = 3;
+        const usersPerPage = 6; // Increased to show more users per page
 
         function fetchUsers(searchQuery = '') {
             document.getElementById('adminInfo').innerText = 'در حال بارگذاری کاربران...';
@@ -265,19 +439,27 @@
             // Render current page users
             tbody.innerHTML = currentUsers.map(user => `
                 <tr>
-                    <td>${user.code}</td>
-                    <td>${user.name}</td>
-                    <td>${user.telegram_id || 'نامشخص'}</td>
+                    <td class="compact-text">${user.code}</td>
+                    <td class="compact-text">${user.name}</td>
+                    <td class="telegram-id">${user.telegram_id || 'نامشخص'}</td>
                     <td>
-                        <input type="number" value="${user.balance || 0}" min="0" style="width:80px; text-align: center;" 
+                        <input type="number" value="${user.balance || 0}" min="0" class="balance-input" 
                                id="balance-${user.id}" onchange="updateBalance(${user.id})">
                     </td>
-                    <td>${user.verified ? 'تایید شده' : 'در انتظار تایید'}</td>
-                    <td>${user.role === 'admin' ? 'ادمین' : 'کاربر'}</td>
+                    <td>
+                        <span class="status-badge ${user.verified ? 'status-verified' : 'status-pending'}">
+                            ${user.verified ? 'تایید' : 'انتظار'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="role-badge ${user.role === 'admin' ? 'role-admin' : 'role-user'}">
+                            ${user.role === 'admin' ? 'ادمین' : 'کاربر'}
+                        </span>
+                    </td>
                     <td>
                         <div class="admin-actions">
-                            <button class="action-btn verify-btn" onclick="verifyUser(${user.id})">${user.verified ? 'لغو تایید' : 'تایید'}</button>
-                            <button class="action-btn role-btn" onclick="toggleRole(${user.id})">تغییر نقش</button>
+                            <button class="action-btn verify-btn" onclick="verifyUser(${user.id})">${user.verified ? 'لغو' : 'تایید'}</button>
+                            <button class="action-btn role-btn" onclick="toggleRole(${user.id})">نقش</button>
                             <button class="action-btn delete-btn" onclick="deleteUser(${user.id})">حذف</button>
                         </div>
                     </td>
@@ -400,6 +582,7 @@
                     document.getElementById('receiptsInfo').innerText = 'خطا در ارتباط با سرور';
                 });
         }
+
         function renderReceipts(receipts) {
             const tbody = document.querySelector('#receiptsTable tbody');
             if (receipts.length === 0) {
@@ -408,15 +591,16 @@
             }
             tbody.innerHTML = receipts.map(r => `
                 <tr>
-                    <td>${r.user}</td>
-                    <td>${r.user_code}</td>
-                    <td><input type="number" value="${r.edited_amount || r.amount}" min="1" style="width:80px" id="amount-${r.id}"></td>
-                    <td><a href="${r.image_url}" target="_blank">مشاهده</a></td>
-                    <td>${r.created_at}</td>
+                    <td class="compact-text">${r.user}</td>
+                    <td class="compact-text">${r.user_code}</td>
+                    <td><input type="number" value="${r.edited_amount || r.amount}" min="1" class="balance-input" id="amount-${r.id}"></td>
+                    <td><a href="${r.image_url}" target="_blank" class="compact-text">مشاهده</a></td>
+                    <td class="compact-text">${r.created_at}</td>
                     <td><button class="action-btn verify-btn" onclick="verifyReceipt(${r.id})">تایید</button></td>
                 </tr>
             `).join('');
         }
+
         function verifyReceipt(id) {
             const amount = document.getElementById(`amount-${id}`).value;
             fetch('/api/verify-receipt/', {
@@ -430,6 +614,7 @@
                     if (data.success) fetchReceipts();
                 });
         }
+
         // Fetch receipts on page load
         fetchReceipts();
 
@@ -464,17 +649,17 @@
             let html = '';
             reports.forEach(report => {
                 const statusBadge = report.is_resolved ?
-                    '<span style="background: #27ae60; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">حل شده</span>' :
-                    '<span style="background: #f39c12; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">در انتظار</span>';
+                    '<span style="background: #27ae60; color: white; padding: 1px 4px; border-radius: 2px; font-size: 8px;">حل شده</span>' :
+                    '<span style="background: #f39c12; color: white; padding: 1px 4px; border-radius: 2px; font-size: 8px;">در انتظار</span>';
 
                 html += `
-                    <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; background: #f8f9fa;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <strong>گزارش #${report.id}</strong>
+                    <div style="border: 1px solid #e0e0e0; border-radius: 6px; padding: 8px; margin-bottom: 8px; background: #f8f9fa;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <strong style="font-size: 10px;">گزارش #${report.id}</strong>
                             ${statusBadge}
                         </div>
                         
-                        <div style="background: white; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px;">
+                        <div style="background: white; padding: 6px; border-radius: 4px; margin-bottom: 6px; font-size: 9px;">
                             <strong>👤 کاربر:</strong> ${report.user_name}<br>
                             <strong>🆔 کد کاربری:</strong> ${report.user_code}<br>
                             <strong>📱 شناسه تلگرام:</strong> ${report.telegram_id}<br>
@@ -482,13 +667,13 @@
                             <strong>🧪 تست شده:</strong> ${report.has_tested ? 'بله' : 'خیر'}
                         </div>
                         
-                        <div style="background: white; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px;">
+                        <div style="background: white; padding: 6px; border-radius: 4px; margin-bottom: 6px; font-size: 9px;">
                             <strong>📝 شرح مشکل:</strong><br>
                             ${report.problem_description}
                         </div>
                         
                         ${report.is_resolved ? `
-                            <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; font-size: 13px;">
+                            <div style="background: #d4edda; color: #155724; padding: 6px; border-radius: 4px; font-size: 9px;">
                                 <strong>✅ حل شده توسط:</strong> ${report.resolved_by}<br>
                                 <strong>📅 تاریخ حل:</strong> ${report.resolved_at}
                             </div>
@@ -542,7 +727,7 @@
                 const table = document.getElementById('usersTable');
                 const paginationDiv = document.createElement('div');
                 paginationDiv.id = 'paginationContainer';
-                paginationDiv.style.marginTop = '15px';
+                paginationDiv.style.marginTop = '8px';
                 paginationDiv.style.textAlign = 'center';
                 table.parentNode.insertBefore(paginationDiv, table.nextSibling);
             }
@@ -552,25 +737,25 @@
                 return;
             }
 
-            let paginationHTML = '<div style="display: flex; justify-content: center; gap: 10px; align-items: center;">';
+            let paginationHTML = '<div style="display: flex; justify-content: center; gap: 6px; align-items: center; flex-wrap: wrap;">';
 
             // Previous button
             if (currentPage > 1) {
-                paginationHTML += `<button class="action-btn role-btn" onclick="changePage(${currentPage - 1})" style="margin: 0; padding: 6px 12px;">⬅️ قبلی</button>`;
+                paginationHTML += `<button class="action-btn role-btn" onclick="changePage(${currentPage - 1})" style="margin: 0; padding: 2px 6px;">⬅️ قبلی</button>`;
             }
 
             // Page numbers
             for (let i = 1; i <= totalPages; i++) {
                 if (i === currentPage) {
-                    paginationHTML += `<span style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; font-size: 14px;">${i}</span>`;
+                    paginationHTML += `<span style="background: #667eea; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">${i}</span>`;
                 } else {
-                    paginationHTML += `<button class="action-btn verify-btn" onclick="changePage(${i})" style="margin: 0; padding: 6px 12px;">${i}</button>`;
+                    paginationHTML += `<button class="action-btn verify-btn" onclick="changePage(${i})" style="margin: 0; padding: 2px 6px;">${i}</button>`;
                 }
             }
 
             // Next button
             if (currentPage < totalPages) {
-                paginationHTML += `<button class="action-btn role-btn" onclick="changePage(${currentPage + 1})" style="margin: 0; padding: 6px 12px;">بعدی ➡️</button>`;
+                paginationHTML += `<button class="action-btn role-btn" onclick="changePage(${currentPage + 1})" style="margin: 0; padding: 2px 6px;">بعدی ➡️</button>`;
             }
 
             paginationHTML += '</div>';
