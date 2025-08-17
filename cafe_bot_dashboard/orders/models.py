@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import receiver
@@ -24,20 +24,23 @@ class TelegramUser(models.Model):
         if not self.user_code:
             # Generate sequential user codes starting from 10000
             try:
-                # Get the highest existing user_code
-                highest_code = TelegramUser.objects.aggregate(
-                    models.Max('user_code')
-                )['user_code__max']
-                
-                if highest_code is None:
-                    # No users exist yet, start from 10000
-                    self.user_code = 10000
-                else:
-                    # Increment from the highest existing code
-                    self.user_code = highest_code + 1
+                # Use select_for_update to prevent race conditions
+                with transaction.atomic():
+                    # Get the highest existing user_code with row lock
+                    highest_code = TelegramUser.objects.select_for_update().aggregate(
+                        models.Max('user_code')
+                    )['user_code__max']
                     
+                    if highest_code is None:
+                        # No users exist yet, start from 10000
+                        self.user_code = 10000
+                    else:
+                        # Increment from the highest existing code
+                        self.user_code = highest_code + 1
+                        
             except Exception as e:
                 # Fallback to 10000 if there's any error
+                print(f"Warning: Error generating user code, using fallback: {e}")
                 self.user_code = 10000
                 
         super().save(*args, **kwargs)
