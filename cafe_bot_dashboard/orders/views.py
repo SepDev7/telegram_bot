@@ -399,7 +399,7 @@ def create_inbound(request):
 
             payload = {
                 "enable": True,
-                "remark": generate_remark(),
+                "remark": generate_remark(user_code=user.user_code),
                 "listen": "",
                 "port": generate_unique_port(),
                 "protocol": "vless",
@@ -573,8 +573,11 @@ def generate_custom_short_ids():
     pattern_lengths = [10, 8, 14, 6, 4, 2, 16, 12]
     return [random_hex(length) for length in pattern_lengths]
 
-def generate_remark(prefix="TD"):
-    return f"{prefix}{random.randint(100, 999)}"
+def generate_remark(user_code=None, prefix="T"):
+    if user_code:
+        return f"{prefix}{user_code}"
+    else:
+        return f"{prefix}{random.randint(100, 999)}"
 
 def generate_random_email():
     local_part = ''.join(random.choices(string.ascii_lowercase + string.digits, k=9))
@@ -670,7 +673,7 @@ def api_config_creator(request):
 
         payload = {
             "enable": True,
-            "remark": generate_remark(),
+            "remark": generate_remark(user_code=user.user_code),
             "listen": "",
             "port": generate_unique_port(),
             "protocol": "vless",
