@@ -157,12 +157,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
         else:
             # Create new user
-            create_user = sync_to_async(TelegramUser.objects.create)
-            user = await create_user(
+            # First create without user_code to trigger the custom save method
+            user = TelegramUser(
                 telegram_id=user_id,
                 full_name=full_name,
                 telegram_username=username,
             )
+            # Save to trigger the custom save method which generates sequential user_code
+            save_user = sync_to_async(user.save)
+            await save_user()
             await update.message.reply_text(
                 f"👋 سلام {full_name}!\n"
                 f"ثبت‌نام شما با موفقیت انجام شد.\n"

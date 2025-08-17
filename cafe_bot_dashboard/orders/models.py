@@ -1,5 +1,4 @@
 from django.db import models
-import random
 from django.db.models.signals import post_save
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import receiver
@@ -23,12 +22,24 @@ class TelegramUser(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.user_code:
-            # Generate a unique 5-digit code
-            while True:
-                code = random.randint(10000, 99999)
-                if not TelegramUser.objects.filter(user_code=code).exists():
-                    self.user_code = code
-                    break
+            # Generate sequential user codes starting from 10000
+            try:
+                # Get the highest existing user_code
+                highest_code = TelegramUser.objects.aggregate(
+                    models.Max('user_code')
+                )['user_code__max']
+                
+                if highest_code is None:
+                    # No users exist yet, start from 10000
+                    self.user_code = 10000
+                else:
+                    # Increment from the highest existing code
+                    self.user_code = highest_code + 1
+                    
+            except Exception as e:
+                # Fallback to 10000 if there's any error
+                self.user_code = 10000
+                
         super().save(*args, **kwargs)
 
     def is_admin(self):

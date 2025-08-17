@@ -83,11 +83,14 @@ class RegisterUserView(APIView):
                 "role": role
             })
 
-        user = TelegramUser.objects.create(
+        # Create user instance first to trigger custom save method
+        user = TelegramUser(
             telegram_id=telegram_id,
             full_name=full_name,
             telegram_username=username,
         )
+        # Save to trigger the custom save method which generates sequential user_code
+        user.save()
 
         # Role creation is now handled by model signal
         return Response({
