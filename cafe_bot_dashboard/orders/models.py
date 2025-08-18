@@ -1,5 +1,5 @@
 from django.db import models, transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import receiver
 import asyncio
@@ -159,7 +159,7 @@ def handle_receipt_notifications(sender, instance, created, **kwargs):
         import json
         
         # Bot token and notification functions
-        BOT_TOKEN = "8173740886:AAGKTILpDMFKNGGoswWNQDLFjy40QVsrCao"
+        from config import BOT_TOKEN
         
         def send_telegram_message(chat_id, message):
             """Send message via Telegram Bot API"""
@@ -239,40 +239,100 @@ class ConfigReport(models.Model):
 # Signal handler for report notifications
 @receiver(post_save, sender=ConfigReport)
 def handle_report_notifications(sender, instance, created, **kwargs):
-    """Handle notifications for report creation"""
+    """Handle notifications for report creation and resolution"""
     
-    if created:
-        try:
-            import requests
-            
-            BOT_TOKEN = "8173740886:AAGKTILpDMFKNGGoswWNQDLFjy40QVsrCao"
-            
-            def send_telegram_message(chat_id, message):
-                url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-                data = {
-                    "chat_id": chat_id,
-                    "text": message,
-                    "parse_mode": "HTML"
-                }
-                try:
-                    response = requests.post(url, json=data, timeout=10)
-                    return response.status_code == 200
-                except Exception as e:
-                    print(f"❌ Failed to send Telegram message: {e}")
-                    return False
-            
-            # Notify all admins about new report
+    try:
+        # Import here to avoid circular imports
+        import requests
+        import json
+        
+        # Bot token and notification functions
+        from config import BOT_TOKEN
+        
+        def send_telegram_message(chat_id, message):
+            """Send message via Telegram Bot API"""
+            url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+            data = {
+                "chat_id": chat_id,
+                "text": message,
+                "parse_mode": "HTML"
+            }
+            try:
+                response = requests.post(url, json=data, timeout=10)
+                return response.status_code == 200
+            except Exception as e:
+                print(f"❌ Failed to send Telegram message: {e}")
+                return False
+        
+        if created:
+            # New report created - notify admins
             admin_message = f"📋 <b>گزارش جدید دریافت شد!</b>\n\n" \
                            f"👤 کاربر: {instance.user.full_name}\n" \
                            f"🆔 کد کاربری: <code>{instance.user.user_code}</code>\n" \
-                           f"📝 مشکل: {instance.problem_description[:100]}{'...' if len(instance.problem_description) > 100 else ''}\n" \
-                           f"🧪 تست شده: {'بله' if instance.has_tested else 'خیر'}\n" \
-                           f"📅 تاریخ: {instance.created_at.strftime('%Y/%m/%d %H:%M')}\n\n" \
-                           f"برای مشاهده جزئیات به پنل ادمین مراجعه کنید."
+                           f"📝 مشکل: {instance.problem_description[:100]}...\n" \
+                           f"📅 تاریخ: {instance.created_at.strftime('%Y/%m/%d %H:%M')}"
             
+            # Get all admin users
             admin_users = TelegramUser.objects.filter(role='admin')
             for admin in admin_users:
                 send_telegram_message(admin.telegram_id, admin_message)
                 
-        except Exception as e:
-            print(f"❌ Error in report notification: {e}")
+        elif instance.is_resolved and instance.resolved_at:
+            # Report resolved - notify user
+            user_message = f"✅ <b>گزارش شما حل شد!</b>\n\n" \
+                          f"📝 مشکل: {instance.problem_description[:100]}...\n" \
+                          f"👨‍💼 حل شده توسط: {instance.resolved_by.full_name if instance.resolved_by else 'مدیر'}\n" \
+                          f"📅 تاریخ حل: {instance.resolved_at.strftime('%Y/%m/%d %H:%M')}"
+            
+            send_telegram_message(instance.user.telegram_id, user_message)
+            
+    except Exception as e:
+        print(f"❌ Error in report notification: {e}")
+
+
+# Signal handler for user verification notifications
+@receiver(pre_save, sender=TelegramUser)
+def store_previous_verification_status(sender, instance, **kwargs):
+    """Store the previous verification status before saving"""
+    try:
+        if instance.pk:  # Only for existing instances
+            old_instance = TelegramUser.objects.get(pk=instance.pk)
+            instance._previous_verification_status = old_instance.is_verified
+        else:
+            instance._previous_verification_status = False
+    except TelegramUser.DoesNotExist:
+        instance._previous_verification_status = False
+    except Exception as e:
+        print(f"❌ Error storing previous verification status: {e}")
+        instance._previous_verification_status = False
+
+
+@receiver(post_save, sender=TelegramUser)
+def handle_user_verification_notification(sender, instance, created, **kwargs):
+    """Handle notifications when a user is verified"""
+    
+    try:
+        # Import here to avoid circular imports
+        from .notifications import send_verification_notification
+        
+        # Check if verification status changed from False to True
+        previous_status = getattr(instance, '_previous_verification_status', False)
+        
+        if not created and instance.is_verified and not previous_status:
+            print(f"🔔 Signal triggered: User {instance.full_name} verification status changed from {previous_status} to {instance.is_verified}")
+            
+            # Send verification notification
+            success = send_verification_notification(instance)
+            
+            if success:
+                print(f"✅ Verification notification sent successfully to {instance.full_name}")
+            else:
+                print(f"❌ Failed to send verification notification to {instance.full_name}")
+            
+    except Exception as e:
+        print(f"❌ Error in user verification notification signal: {e}")
+        import traceback
+        traceback.print_exc()
+
+
+

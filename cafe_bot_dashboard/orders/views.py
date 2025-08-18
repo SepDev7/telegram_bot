@@ -828,8 +828,15 @@ def api_config_creator(request):
 @telegram_admin_required
 def toggle_verify(request, user_id):
     user = get_object_or_404(TelegramUser, id=user_id)
+    was_verified = user.is_verified
     user.is_verified = not user.is_verified
     user.save()
+    
+    # Send notification if user was just verified
+    if user.is_verified and not was_verified:
+        from .notifications import send_verification_notification
+        send_verification_notification(user)
+    
     return JsonResponse({'success': True, 'is_verified': user.is_verified})
 
 @telegram_admin_required
@@ -887,8 +894,15 @@ def admin_user_verify(request):
         data = json.loads(request.body)
         user_id = data.get('id')
         user = TelegramUser.objects.get(id=user_id)
+        was_verified = user.is_verified
         user.is_verified = not user.is_verified
         user.save()
+        
+        # Send notification if user was just verified
+        if user.is_verified and not was_verified:
+            from .notifications import send_verification_notification
+            send_verification_notification(user)
+        
         return JsonResponse({'success': True, 'verified': user.is_verified})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
